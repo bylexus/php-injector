@@ -1,0 +1,19 @@
+{
+    "name": "bylexus/php-injector",
+    "description": "A Function / Method parameter injection helper",
+    "require-dev": {
+        "phpunit/phpunit": "~4.4"
+    },
+    "authors": [
+        {
+            "name": "Alexander Schenkel",
+            "email": "alex@alexi.ch"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "PhpInjector\\": "lib/"
+        }
+    }
+}
