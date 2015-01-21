@@ -87,7 +87,6 @@ namespace PhpInjector {
 				);
 			}
 			$this->extractTypeInfos($this->_reflectionFunction->getDocComment(),$info);
-			var_dump($info);
 			return $info;
 		}
 
@@ -129,7 +128,6 @@ namespace PhpInjector {
 			if (!$this->allowUnknownParams && count($args) > 0) {
 				throw new \Exception('Unknown Parameters found: '.join(', ',array_keys($args)));
 			}
-			var_dump($callParams);
 			if ($this->_reflectionFunction instanceof \ReflectionFunction) {
 				return $this->_reflectionFunction->invokeArgs($callParams);
 			} else if ($this->_reflectionFunction instanceof \ReflectionMethod) {

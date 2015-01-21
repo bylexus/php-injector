@@ -4,8 +4,7 @@ namespace PhpInjector {
 		public static function cast($value, $type) {
 			// strip away my own namespace from type:			
 			$type = preg_replace('/^\\\\{0,1}'.__NAMESPACE__.'\\\\/', '', $type);
-			var_dump($type);
-			switch ($type) {
+			switch (strtolower($type)) {
 				case 'boolean':
 				case 'bool': return BooleanTypeCaster::cast($value);
 				case 'integer':

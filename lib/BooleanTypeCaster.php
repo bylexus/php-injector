@@ -4,7 +4,7 @@ namespace PhpInjector {
 		public static function cast($value) {
 			return 
 				true === $value ||
-				$value > 0 ||
+				$value == 1 ||
 				strtolower($value) === 'true' ||
 				strtolower($value) === 'on' ||
 				strtolower($value) === 'yes' ||

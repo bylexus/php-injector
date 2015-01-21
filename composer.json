@@ -15,5 +15,9 @@
         "psr-4": {
             "PhpInjector\\": "lib/"
         }
+    },
+
+    "scripts": {
+        "test": "vendor/bin/phpunit tests"
     }
 }
