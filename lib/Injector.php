@@ -132,6 +132,16 @@ namespace PhpInjector {
 			return $matches;
 		}
 
+
+		/**
+		 * Returns the detected input parameters for the given function / method.
+		 *
+		 * @return array An associative array containing 'param_name' => array() elements with the detected parameters
+		 */
+		public function getInputParameters() {
+			return $this->_parameters;
+		}
+
 		/**
 		 * Invokes the configured function / method, injecting
 		 * the given parameters. The $args array is an array

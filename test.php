@@ -29,4 +29,6 @@ use PhpInjector\Injector;
 	$injectorMethod->invoke(array('b' => 5,'a'=>'hello','test'=>'yes'));
 	// $injectorFunction->invoke(array('b' => 5,'a'=>'hello'));
 
-
+	$inj = new Injector('strtolower');
+	var_dump($inj->getInputParameters());
+	var_dump($inj->invoke(array('str'=> 'I SHOULD BE BIG!')));

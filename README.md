@@ -231,6 +231,25 @@ This defines some conditions for the input parameters. If they do not match, an 
 Examples
 -----------
 
+### using native PHP functions
+
+You can even use native PHP functions:
+```php
+$inj = \PhpInjector\Injector('strtolower');
+echo $inj->invoke(array('str'=>'HEY, WHY AM I SMALL?'));
+```
+
+
+Developing
+-----------
+
+### run unit tests
+
+<code>composer test</code>
+
+or manually, using PHPUnit:
+
+<code>php phpunit.phar ./tests</code>
 
 
 TODO
