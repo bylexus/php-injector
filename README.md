@@ -190,6 +190,8 @@ Special types:
 
 #### Using parameter conditions
 
+> (not yet implemented)
+
 Especially for frontend input validation it is useful to check the input value if they match certain conditions, e.g. if a number is in a given range, if a string fits into a maxlength, if a date is in a certain range etc. PhpInjector comes with a set of condition definitions. We also use the DocBlock comment as shown above, and extend the <code>Type</code> field as shown in the following example:
 
 ```php
@@ -220,12 +222,11 @@ Examples
 
 
 
-Work In Progress
+TODO
 -----------------
 a lot to do, not yet done, initial commit only. Here's what to expect later on:
 
 * available as composer package
-* cast to special types (time, json, ...)
 * support for min/max/range definitions (or validation)
   (e.g. int[>0], int[1..100]), timestamp[01.01.2000..31.12.2000], string[<100]
 * define own conditions
