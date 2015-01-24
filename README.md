@@ -12,10 +12,21 @@ Features
 * helps you to make parameter validation / conversion. Especially useful when
   used in frontend-faced Controllers.
 
-Summary
+Installation
 ------------
 
-UNDER CONSTRUCTION!
+via [Composer](https://getcomposer.org/):
+
+<code>composer require bylexus/php-injector</code>
+
+Then just use the composer's autoload facility:
+```php
+require_once('vendor/autoload.php');
+$injector = new \PhpInjector\Injector('myfunction');
+```
+
+Summary
+------------
 
 Under some circumstances it is needed or wanted to call a function
 not directly but to "collect" the parameters somehow dynamically and
