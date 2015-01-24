@@ -26,8 +26,7 @@ Why?
 Think for example you want to pass Web request parameters as function
 parameters of a controller, like this:
 
-```
-<?php
+```php
 $_REQUEST = array('name' => 'Alex','age' => '24', 'active' => 'true');
 
 function storePersonInfo($name, $age, $active = false) {
@@ -49,8 +48,7 @@ This is where the Injector comes into play: It allows you to:
 
 Using the Injector, this looks as follows:
 
-```
-<?php
+```php
 $_REQUEST = array('name' => 'Alex','age' => '24','active' => 'true');
 
 /**
@@ -73,8 +71,7 @@ in the correct order AND cast the types, so in the example, <code>$age</code> is
 
 This also works in object methods:
 
-```
-<?php
+```php
 $_REQUEST = array('name' => 'Alex','age' => '24','active' => 'true');
 
 class MyController {
@@ -104,7 +101,7 @@ Function / Method definition
 
 If you just want to call your functions / methods without do any type casting / conditions, you just define your functions as usual:
 
-```
+```php
 // Normal function:
 function teaser($text, $maxlen = 80, $tail = '...') {
     if (mb_strlen($text) > $maxlen) {
@@ -127,7 +124,7 @@ class TextHandler {
 ```
 
 You can then use the Injector to invoke the functions (note that the argument array parameters don't have to be in the function args order):
-```
+```php
 // Function injector:
 $injector = new \PhpInjector\Injector('teaser');
 $ret = $injector->invoke(array(
@@ -157,11 +154,11 @@ with the default PHP function definition.
 
 The syntax is similar to the [PhpDocumentor's <code>@param</code> definition](http://www.phpdoc.org/docs/latest/references/phpdoc/tags/param.html):
 
-> <code>@param [Type] [name] [<description>]</code>
+> <code>@param [Type] [name] [description]</code>
 
 An example:
 
-```
+```php
 /**
  * A fancy function with some weird input params
  *
@@ -195,7 +192,7 @@ Special types:
 
 Especially for frontend input validation it is useful to check the input value if they match certain conditions, e.g. if a number is in a given range, if a string fits into a maxlength, if a date is in a certain range etc. PhpInjector comes with a set of condition definitions. We also use the DocBlock comment as shown above, and extend the <code>Type</code> field as shown in the following example:
 
-```
+```php
 /**
  * A fancy function with some weird input params
  *
