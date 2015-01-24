@@ -90,7 +90,7 @@ namespace PhpInjector {
 			return new \ReflectionFunction($function);
 		}
 
-		protected function parseFunctionParams(array &$params) {
+		protected function parseFunctionParams(array $params) {
 			$info = array();
 			foreach($params as $param) {
 				$info[$param->getName()] = array(
