@@ -34,6 +34,18 @@ namespace PhpInjector {
 			$this->_parameters = $this->parseFunctionParams($this->_reflectionFunction->getParameters());
 		}
 
+		public function getReflectionFunction() {
+			return $this->_reflectionFunction;
+		}
+
+		public function getFunction() {
+			return $this->_function;
+		}
+
+		public function getObject() {
+			return $this->_object;
+		}
+
 		protected function initOptions(array $options = null) {
 			if (is_array($options)) {
 				if (isset($options['allow_unknown_params'])) {
@@ -48,9 +60,11 @@ namespace PhpInjector {
 			} else {
 				throw new \Exception('Function not found: '.$funcName);
 			}
+			return $this->_function;
 		}
 		protected function initClosure(\Closure $func) {
 			$this->_function = $func;
+			return $this->_function;
 		}
 
 		protected function initMethod(array $objInfo) {
@@ -65,6 +79,7 @@ namespace PhpInjector {
 			}
 			$this->_object = $objInfo[0];
 			$this->_function = $objInfo[1];
+			return array($this->_object,$this->_function);
 		}
 
 		protected function buildMethodReflector($object, $function) {
@@ -83,10 +98,11 @@ namespace PhpInjector {
 					'position' => $param->getPosition(),
 					'optional' => $param->isOptional(),
 					'type' => null,
+					'condition' => null,
 					'default_value' => ($param->isDefaultValueAvailable()?$param->getDefaultValue():null)
 				);
 			}
-			$this->extractTypeInfos($this->_reflectionFunction->getDocComment(),$info);
+			$this->extractTypeInfos($this->getReflectionFunction()->getDocComment(),$info);
 			return $info;
 		}
 
@@ -94,16 +110,26 @@ namespace PhpInjector {
 		 * gets a doc comment block as string and tries to extract type information
 		 * from it, storing in the param info array given.
 		 *
-		 * Looks for doc commends like "@param <type> <varname> ....".
+		 * Looks for doc comments like "@param <type> <varname> ....".
 		 */
 		protected function extractTypeInfos($docComment, &$paramInfo) {
-			$matches = array();
-			preg_match_all('/@param\s+(?P<type>\w+)\s+\$(?P<varname>\w+)/', $docComment, $matches);
+			$matches = $this->matchParams($docComment);
 			foreach($matches['varname'] as $key=>$varname) {
 				if (!empty($matches['type'][$key]) && isset($paramInfo[$varname])) {
 					$paramInfo[$varname]['type'] = $matches['type'][$key];
+					$paramInfo[$varname]['condition'] = (!empty($matches['condition'][$key])?$matches['condition'][$key]:null);
 				}
 			}
+		}
+
+
+		protected function matchParams($docComment) {
+			$matches = array();
+			preg_match_all(
+				'/@param\s+(?P<type>\w+)(\[(?P<condition>.*)\])*\s+\$(?P<varname>\w+)/',
+				$docComment,
+				$matches);
+			return $matches;
 		}
 
 		/**
@@ -128,7 +154,9 @@ namespace PhpInjector {
 			if (!$this->allowUnknownParams && count($args) > 0) {
 				throw new \Exception('Unknown Parameters found: '.join(', ',array_keys($args)));
 			}
+			
 			if ($this->_reflectionFunction instanceof \ReflectionFunction) {
+				$ret = $this->_reflectionFunction->invokeArgs($callParams);
 				return $this->_reflectionFunction->invokeArgs($callParams);
 			} else if ($this->_reflectionFunction instanceof \ReflectionMethod) {
 				return $this->_reflectionFunction->invokeArgs($this->_object, $callParams);

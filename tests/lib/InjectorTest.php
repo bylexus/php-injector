@@ -5,47 +5,50 @@
  * @param string $a Something
  */
 function myFancyFunctionUnderTest($a, $b, $cee = 5, $dee = 'hello') {
-
+	return array(
+			'a' => $a,
+			'b' => $b,
+			'cee' => $cee,
+			'dee' => $dee
+		);
 }
 
 class AFancyClassUnderTest {
 	/**
 	 * @param int $cee A cee param
 	 * @param string $a Something
+	 * @param int[>0] $b
 	 */
 	public function myFancyFunctionUnderTest($a, $b, $cee = 5, $dee = 'hello') {
-
-	}	
-}
-
-class PublicTestClassOfInjector extends \PhpInjector\Injector {
-	public $_reflectionFunction = null;
-
-	public function __construct() {}
-
-	public function __call($name, $args) {
-		return call_user_func_array(array($this,$name),$args);
-	}
-
-	public function __get($name) {
-		return $this->{$name};
-	}
-
-	public function parseFunctionParams(array &$params) {
-		return parent::parseFunctionParams($params);
+		return array(
+			'a' => $a,
+			'b' => $b,
+			'cee' => $cee,
+			'dee' => $dee
+		);
 	}
 }
 
 class InjectorTest extends \PHPUnit_Framework_TestCase {
+	protected static function getMethod($object, $name) {
+		$class = new ReflectionClass($object);
+		$method = $class->getMethod($name);
+		$method->setAccessible(true);
+		return $method;
+	}
+
 	public function test_initOptions() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initOptions(null);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initOptions = $this->getMethod($inj,'initOptions');
+		$initOptions->invoke($inj,null);
 		$this->assertTrue($inj->allowUnknownParams);
 
-		$inj->initOptions(array('allow_unknown_params'=>true));
+		$initOptions->invoke($inj,array('allow_unknown_params'=>true));
 		$this->assertTrue($inj->allowUnknownParams);
 
-		$inj->initOptions(array('allow_unknown_params'=>false));
+		$initOptions->invoke($inj,array('allow_unknown_params'=>false));
 		$this->assertFalse($inj->allowUnknownParams);
 	}
 
@@ -53,28 +56,40 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Exception
      */
 	public function test_initFunctionNull() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initFunction(null);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initFunction = $this->getMethod($inj,'initFunction');
+		$initFunction->invoke($inj,null);
 	}
 
 	/**
      * @expectedException Exception
      */
 	public function test_initFunctionNotfound() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initFunction('jdhfhsdfgfhfhffhjfhjfhjshjhfjhfs');
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initFunction = $this->getMethod($inj,'initFunction');
+		$initFunction->invoke($inj,'jdhfhsdfgfhfhffhjfhjfhjshjhfjhfs');
 	}
 
 	public function test_initFunctionGood() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initFunction('myFancyFunctionUnderTest');
-		$this->assertSame('myFancyFunctionUnderTest',$inj->_function);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initFunction = $this->getMethod($inj,'initFunction');
+		$ret = $initFunction->invoke($inj,'myFancyFunctionUnderTest');
+		$this->assertEquals('myFancyFunctionUnderTest',$ret);
 	}
 
 	public function test_initClosure() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initClosure(function(){});
-		$this->assertInstanceof('Closure',$inj->_function);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initClosure = $this->getMethod($inj,'initClosure');
+		$ret = $initClosure->invoke($inj,function(){});
+		$this->assertInstanceof('Closure',$ret);
 	}
 
 
@@ -82,17 +97,22 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
      * @expectedException Exception
      */
 	public function test_initMethodNull() {
-		$inj = new PublicTestClassOfInjector();
-		$inj->initMethod(array());
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initMethod = $this->getMethod($inj,'initMethod');
+		$initMethod->invoke($inj,array());
 	}
 
 	/**
      * @expectedException Exception
      */
 	public function test_initMethodNoObject() {
-
-		$inj = new PublicTestClassOfInjector();
-		$inj->initMethod(array(null,'myFancyFunctionUnderTest'));
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initMethod = $this->getMethod($inj,'initMethod');
+		$initMethod->invoke($inj,array(null,'myFancyFunctionUnderTest'));
 	}
 
 	/**
@@ -100,37 +120,49 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
      */
 	public function test_initMethodNoMethod() {
 		$o = new AFancyClassUnderTest();
-		$inj = new PublicTestClassOfInjector();
-		$inj->initMethod(array($o,'unknown'));
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initMethod = $this->getMethod($inj,'initMethod');
+		$initMethod->invoke($inj,array($o,'unknown'));
 	}
 
 	public function test_initMethod() {
 		$o = new AFancyClassUnderTest();
-		$inj = new PublicTestClassOfInjector();
-		$inj->initMethod(array($o,'myFancyFunctionUnderTest'));
-		$this->assertSame($o,$inj->_object);
-		$this->assertSame('myFancyFunctionUnderTest',$inj->_function);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$initMethod = $this->getMethod($inj,'initMethod');
+		$ret = $initMethod->invoke($inj,array($o,'myFancyFunctionUnderTest'));
+		$this->assertSame($o,$ret[0]);
+		$this->assertSame('myFancyFunctionUnderTest',$ret[1]);
 	}
 
 	public function test_BuildMethodReflector() {
 		$o = new AFancyClassUnderTest();
-		$inj = new PublicTestClassOfInjector();
-		$res = $inj->buildMethodReflector($o,'myFancyFunctionUnderTest');
-		$this->assertInstanceof('ReflectionMethod',$res);
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$buildMethodReflector = $this->getMethod($inj,'buildMethodReflector');
+		$ret = $buildMethodReflector->invoke($inj, $o, 'myFancyFunctionUnderTest');
+		$this->assertInstanceof('ReflectionMethod',$ret);
 	}
 
 	public function test_BuildFunctionReflector() {
-		$inj = new PublicTestClassOfInjector();
-		$res = $inj->buildFunctionReflector('myFancyFunctionUnderTest');
+		$inj = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$buildFunctionReflector = $this->getMethod($inj,'buildFunctionReflector');
+		$res = $buildFunctionReflector->invoke($inj,'myFancyFunctionUnderTest');
 		$this->assertInstanceof('ReflectionFunction',$res);
 	}
 
 	public function test_parseFunctionParams() {
-		$mock = $this->getMockBuilder('PublicTestClassOfInjector')
+		$mock = $this->getMockBuilder('\PhpInjector\Injector')
 		             ->disableOriginalConstructor()
-		             ->setMethods(array('extractTypeInfos'))
+		             ->setMethods(array('extractTypeInfos','getReflectionFunction'))
 		             ->getMock();
-		$mock->_reflectionFunction = new ReflectionFunction('myFancyFunctionUnderTest');
+		$mock->method('getReflectionFunction')->willReturn(new ReflectionFunction('myFancyFunctionUnderTest'));
 
 		$paramStub = $this->getMockBuilder('ReflectionParameter')->disableOriginalConstructor()->getMock();
 		$paramStub->method('getName')->willReturn('myParam');
@@ -148,16 +180,100 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
 
 
 		$params = array($paramStub);
-		$ret = $mock->parseFunctionParams($params);
-
+		$parseFunctionParams = $this->getMethod($mock,'parseFunctionParams');
+		$ret = $parseFunctionParams->invokeArgs($mock,array(&$params));
+		
 		$this->assertSame(array(
 			'myParam' => array(
 				'name' => 'myParam',
 				'position' => 1,
 				'optional' => true,
 				'type' => null,
+				'condition' => null,
 				'default_value' => 5,
 			)
+		),$ret);
+	}
+
+	public function test_ExtractTypeInfos() {
+		$params = array(
+			'a' => array(),
+			'b' => array(),
+			'c' => array(),
+			'd' => array()
+		);
+		$mock = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->setMethods(array('matchParams'))
+		             ->getMock();
+		$mock->method('matchParams')->willReturn(array(
+			'varname' => array('a','b','c','d'),
+			'type' => array('int','int','int','string'),
+			'condition' => array('','>0','0..100',''),
+		));
+
+		$extractTypeInfos = $this->getMethod($mock,'extractTypeInfos');
+		$ret = $extractTypeInfos->invokeArgs($mock,array('', &$params));
+		
+		$this->assertTrue(true,$ret);
+	}
+
+	public function test_MatchParams() {
+		$comment = '
+		/**
+		 * This is a doc comment.
+		 * @param int $a Var a
+		 * @param int[>0] $b Var b
+		 * @param int[0..100] $c Var c
+		 * @param string $d Var d
+		 */
+		';
+		$mock = $this->getMockBuilder('\PhpInjector\Injector')
+		             ->disableOriginalConstructor()
+		             ->getMock();
+		$matchParams = $this->getMethod($mock,'matchParams');
+		$ret = $matchParams->invoke($mock,$comment);
+
+		$this->assertSame('a',$ret['varname'][0]);
+		$this->assertSame('b',$ret['varname'][1]);
+		$this->assertSame('c',$ret['varname'][2]);
+		$this->assertSame('d',$ret['varname'][3]);
+
+		$this->assertSame('int',$ret['type'][0]);
+		$this->assertSame('int',$ret['type'][1]);
+		$this->assertSame('int',$ret['type'][2]);
+		$this->assertSame('string',$ret['type'][3]);
+
+		$this->assertSame('',$ret['condition'][0]);
+		$this->assertSame('>0',$ret['condition'][1]);
+		$this->assertSame('0..100',$ret['condition'][2]);
+		$this->assertSame('',$ret['condition'][3]);
+	}
+
+	public function test_InvokeWithFunction() {
+		$inj = new \PhpInjector\Injector('myFancyFunctionUnderTest');
+		$ret = $inj->invoke(array(
+			'dee' => 'ddd',
+			'b' => 'bbb',
+			'cee' => '55',
+			'a' => 'aaa'
+		));
+		$this->assertSame(array(
+			'a' => 'aaa',
+			'b' => 'bbb',
+			'cee' => 55,
+			'dee' => 'ddd'
+		),$ret);
+
+		$ret = $inj->invoke(array(
+			'b' => 'bbb',
+			'a' => 'aaa'
+		));
+		$this->assertSame(array(
+			'a' => 'aaa',
+			'b' => 'bbb',
+			'cee' => 5,
+			'dee' => 'hello'
 		),$ret);
 	}
 }

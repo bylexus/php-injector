@@ -14,6 +14,7 @@ namespace PhpInjector {
 				case 'string': return StringTypeCaster::cast($value);
 				case 'array': return ArrayTypeCaster::cast($value);
 				case 'object': return ObjectTypeCaster::cast($value);
+				case 'mixed': return $value;
 			}
 			throw new \Exception('Cannot (yet) cast to type '.$type);
 		}

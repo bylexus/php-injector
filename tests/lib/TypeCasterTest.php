@@ -13,5 +13,10 @@ class TypeCasterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame("1000",\PhpInjector\TypeCaster::cast(1000,'String'));
 		$this->assertTrue(is_object(\PhpInjector\TypeCaster::cast('Hello','object')));
+
+		$this->assertSame("1000",\PhpInjector\TypeCaster::cast('1000','mixeD'));
+		$this->assertSame(1000,\PhpInjector\TypeCaster::cast(1000,'mixeD'));
+		$this->assertSame(true,\PhpInjector\TypeCaster::cast(true,'mixeD'));
+		$this->assertSame(array(2),\PhpInjector\TypeCaster::cast(array(2),'mixeD'));
 	}
 }

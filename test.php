@@ -30,15 +30,3 @@ use PhpInjector\Injector;
 	// $injectorFunction->invoke(array('b' => 5,'a'=>'hello'));
 
 
-
-/**
-
-TODO:
-
-* cast to classes or, at least, to pre-defined Injector types (e.g. JSON => expect the input to be a json string and cast to object)
-* throw specific errors
-* support closures
-* create curry function
-
-
-*/
