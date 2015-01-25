@@ -117,11 +117,14 @@ namespace PhpInjector {
 			foreach($matches['varname'] as $key=>$varname) {
 				if (!empty($matches['type'][$key]) && isset($paramInfo[$varname])) {
 					$paramInfo[$varname]['type'] = $matches['type'][$key];
-					$paramInfo[$varname]['condition'] = (!empty($matches['condition'][$key])?$matches['condition'][$key]:null);
+					$conditionStr = (!empty($matches['condition'][$key])?$matches['condition'][$key]:null);
+					if ($conditionStr) {
+						$cond = Condition::getCondition($paramInfo[$varname]['type'], $conditionStr);
+						$paramInfo[$varname]['condition'] = $cond;
+					}
 				}
 			}
 		}
-
 
 		protected function matchParams($docComment) {
 			$matches = array();
@@ -189,11 +192,29 @@ namespace PhpInjector {
 					throw new \Exception("parameter '{$name}' is not optional.");
 				}
 			}
+
+			$cond = $expectedParam['condition'];
+			if ($cond instanceof Condition) {
+				$this->checkParameterValidity($value, $expectedParam, $cond);
+			}
+
 			if (!empty($expectedParam['type'])) {
 				$callParams[$position] = TypeCaster::cast($value, $expectedParam['type']);
 			} else {
 				$callParams[$position] = $value;
 			}
+		}
+
+		protected function checkParameterValidity($value, $expectedParam, Condition $cond) {
+			$result = $cond->check($value);
+			if ($result !== true) {
+				if ($expectedParam['optional'] && $value == null) {
+					return true;
+				}
+				throw new \Exception("Parameter '{$expectedParam['name']}' of type '{$expectedParam['type']}' with value '{$value}' invalid for condition '{$cond->getConditionString()}'");
+			}
+
+			return true;
 		}
 	}
 }

@@ -11,6 +11,7 @@ Features
 * Define types and even conditions in a simple DocBlock format
 * helps you to make parameter validation / conversion. Especially useful when
   used in frontend-faced Controllers.
+* Check input variable for matching conditions (e.g. string length, number in a certain range, date > now etc...)
 
 Installation
 ------------
@@ -220,9 +221,10 @@ This defines some conditions for the input parameters. If they do not match, an 
 
 #### Available conditions
 
-* <code><, <=, =, >, >= [number]</code>
+* <code><, <=, >, >=, <> [nr|timestamp]</code>
     - numbers: Input must match the comparison (e.g. <=100: input must be less or equal 100)
     - strings: input length must match the comparison
+    - timestamps: input date/time must match the comparison date/time
 * <code>[lower]..[upper]</code>: Input must be within the border
     - For numbers: e.g. <code>int[1..100]</code>: Input value must be between 1 to 100 (including 1 and 100)
     - For strings: e.g. <code>string[5..20]</code>: Input must be at least 5 characters, but max. 20 characters long
@@ -230,6 +232,69 @@ This defines some conditions for the input parameters. If they do not match, an 
 
 Examples
 -----------
+
+### Simple function parameter injection
+
+```php
+require_once('vendor/autoload.php');
+
+// Function to use for injection:
+function fact($n) {
+    if ($n > 1) { 
+        return $n*fact($n-1);
+    } else return 1;
+}
+
+// Injector with no type casting / conditions:
+$injector = new \PhpInjector\Injector('fact');
+$ret = $injector->invoke(array('n'=>4)); // 24
+```
+
+### Parameter injection with type casting
+
+```php
+require_once('vendor/autoload.php');
+
+// Function to use for injection: DocBlock defines the casting type:
+/**
+ * calculates the factorial of n.
+ * 
+ * @param int $n The value to calculate the factorial from
+ */
+function fact($n) {
+    // here, $n is casted to an int:
+    if ($n > 1) { 
+        return $n*fact($n-1);
+    } else return 1;
+}
+
+// Injector with type casting to int:
+$injector = new \PhpInjector\Injector('fact');
+$ret = $injector->invoke(array('n'=>4.5)); // 24
+```
+
+### Parameter injection with type casting and conditions
+
+```php
+require_once('vendor/autoload.php');
+
+// Function to use for injection: DocBlock defines the casting type and condition:
+/**
+ * calculates the factorial of n.
+ * 
+ * @param int[>0] $n The value to calculate the factorial from
+ */
+function fact($n) {
+    // here, $n is casted to an int. An exception is thrown when $n is < 1.
+    if ($n > 1) { 
+        return $n*fact($n-1);
+    } else return 1;
+}
+
+// Injector with type casting to int:
+$injector = new \PhpInjector\Injector('fact');
+$ret = $injector->invoke(array('n'=>4.5)); // 24
+```
 
 ### using native PHP functions
 
@@ -256,9 +321,6 @@ TODO
 -----------------
 a lot to do, not yet done, initial commit only. Here's what to expect later on:
 
-* available as composer package
-* support for min/max/range definitions (or validation)
-  (e.g. int[>0], int[1..100]), timestamp[01.01.2000..31.12.2000], string[<100]
 * define own conditions
 * fail on wrong/unsupported parameters
 * throw specific errors
