@@ -2,7 +2,8 @@
 namespace PhpInjector {
 	class BooleanTypeCaster {
 		public static function cast($value) {
-			return 
+            if ($value === null) return null;
+			return
 				true === $value ||
 				$value == 1 ||
 				strtolower($value) === 'true' ||
@@ -11,5 +12,5 @@ namespace PhpInjector {
 				strtolower($value) === 't' ||
 				strtolower($value) === 'true';
 		}
-	}	
+	}
 }

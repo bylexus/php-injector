@@ -18,10 +18,10 @@ class IntegerTypeCasterTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame(2,\PhpInjector\IntegerTypeCaster::cast('2.5e+3'));
 		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast("Slex 2"));
 		$this->assertSame(2,\PhpInjector\IntegerTypeCaster::cast("2tousand"));
-		
+
 		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast(''));
 		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast(false));
-		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast(null));
+		$this->assertSame(null,\PhpInjector\IntegerTypeCaster::cast(null));
 		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast('yEs'));
 		$this->assertSame(0,\PhpInjector\IntegerTypeCaster::cast(' '));
 	}

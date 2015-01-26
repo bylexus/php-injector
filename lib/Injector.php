@@ -167,7 +167,7 @@ namespace PhpInjector {
 			if (!$this->allowUnknownParams && count($args) > 0) {
 				throw new \Exception('Unknown Parameters found: '.join(', ',array_keys($args)));
 			}
-			
+
 			if ($this->_reflectionFunction instanceof \ReflectionFunction) {
 				$ret = $this->_reflectionFunction->invokeArgs($callParams);
 				return $this->_reflectionFunction->invokeArgs($callParams);
@@ -182,7 +182,7 @@ namespace PhpInjector {
 			$name = $expectedParam['name'];
 			$position = $expectedParam['position'];
 			$value = null;
-			if (isset($params[$name])) {
+			if (array_key_exists($name, $params)) {
 				$value = $params[$name];
 				unset($params[$name]);
 			} else {

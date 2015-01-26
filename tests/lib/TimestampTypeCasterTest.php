@@ -3,8 +3,8 @@ class TimestampTypeCasterTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_cast() {
 		$this->assertSame(false,\PhpInjector\TimestampTypeCaster::cast('invalid date'));
-		$this->assertSame(false,\PhpInjector\TimestampTypeCaster::cast(null));
-		
+		$this->assertSame(null,\PhpInjector\TimestampTypeCaster::cast(null));
+
 		// hopefully that runs in the same second...
 		$exp = strtotime('now');
 		$this->assertSame($exp,\PhpInjector\TimestampTypeCaster::cast('now'));

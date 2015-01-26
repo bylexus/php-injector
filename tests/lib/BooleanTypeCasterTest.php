@@ -15,7 +15,7 @@ class BooleanTypeCasterTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame(true,\PhpInjector\BooleanTypeCaster::cast(true));
 		$this->assertSame(true,\PhpInjector\BooleanTypeCaster::cast(1));
 		$this->assertSame(true,\PhpInjector\BooleanTypeCaster::cast('1'));
-		
+
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast('FaLsE'));
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast(''));
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast(0.9));
@@ -25,5 +25,7 @@ class BooleanTypeCasterTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast('5'));
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast(5));
 		$this->assertSame(false,\PhpInjector\BooleanTypeCaster::cast(3.4));
+
+        $this->assertSame(null,\PhpInjector\BooleanTypeCaster::cast(null));
 	}
 }

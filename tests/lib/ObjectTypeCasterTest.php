@@ -20,6 +20,7 @@ class ObjectTypeCasterTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($this->setObj('scalar','2.5e+3')->scalar,\PhpInjector\ObjectTypeCaster::cast('2.5e+3')->scalar);
 		$this->assertSame($this->setObj('scalar',"Slex 2")->scalar,\PhpInjector\ObjectTypeCaster::cast("Slex 2")->scalar);
 		$this->assertSame($this->setObj('scalar',true)->scalar,\PhpInjector\ObjectTypeCaster::cast(true)->scalar);
+        $this->assertSame(null,\PhpInjector\ObjectTypeCaster::cast(null)->scalar);
 
 		$obj = new stdClass();
 		$obj->{0} = 1;
