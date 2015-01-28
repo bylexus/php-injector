@@ -27,6 +27,10 @@ class AFancyClassUnderTest {
 			'dee' => $dee
 		);
 	}
+
+    private function myPrivateFancyFunctionUnderTest($a) {
+        return $a;
+    }
 }
 
 class InjectorTest extends \PHPUnit_Framework_TestCase {
@@ -144,8 +148,12 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
 		             ->disableOriginalConstructor()
 		             ->getMock();
 		$buildMethodReflector = $this->getMethod($inj,'buildMethodReflector');
-		$ret = $buildMethodReflector->invoke($inj, $o, 'myFancyFunctionUnderTest');
+		$ret = $buildMethodReflector->invoke($inj, $o, 'myPrivateFancyFunctionUnderTest');
 		$this->assertInstanceof('ReflectionMethod',$ret);
+
+        // Test private accessibility:
+        $good = $ret->invoke($o,'hello');
+        $this->assertEquals('hello',$good);
 	}
 
 	public function test_BuildFunctionReflector() {
@@ -182,7 +190,7 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
 		$params = array($paramStub);
 		$parseFunctionParams = $this->getMethod($mock,'parseFunctionParams');
 		$ret = $parseFunctionParams->invokeArgs($mock,array(&$params));
-		
+
 		$this->assertSame(array(
 			'myParam' => array(
 				'name' => 'myParam',
@@ -214,7 +222,7 @@ class InjectorTest extends \PHPUnit_Framework_TestCase {
 
 		$extractTypeInfos = $this->getMethod($mock,'extractTypeInfos');
 		$ret = $extractTypeInfos->invokeArgs($mock,array('', &$params));
-		
+
 		$this->assertTrue(true,$ret);
 	}
 

@@ -83,8 +83,10 @@ namespace PhpInjector {
 		}
 
 		protected function buildMethodReflector($object, $function) {
-			return new \ReflectionMethod($object, $function);
-		}
+            $m = new \ReflectionMethod($object, $function);
+            $m->setAccessible(true);
+            return $m;
+        }
 
 		protected function buildFunctionReflector($function) {
 			return new \ReflectionFunction($function);
