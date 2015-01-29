@@ -39,9 +39,9 @@ namespace PhpInjector {
             // matches e.g. 'word1|word2|word with\|pipe':
             '/(?P<w>(?:[^\\\\|]+|\\\\\\|?)+)/' => function($testValue, $matches) {
                 $check = array_map(function($el) {
-                    return str_replace('\|', '|', $el);
+                    return mb_strtolower(str_replace('\|', '|', $el));
                 }, $matches['w']);
-                return in_array($testValue, $check);
+                return in_array(mb_strtolower($testValue), $check);
             });
 		}
 	}

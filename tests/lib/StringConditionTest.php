@@ -80,8 +80,8 @@ class StringConditionTest extends \PHPUnit_Framework_TestCase {
 	}
 
     public function test_check_wordlist() {
-        $c = new \PhpInjector\StringCondition('word1| word 2 |word\|3');
-        $this->assertTrue($c->check('word1'));
+        $c = new \PhpInjector\StringCondition('word1| WORD 2 |word\|3');
+        $this->assertTrue($c->check('wOrD1'));
         $this->assertTrue($c->check(' word 2 '));
         $this->assertTrue($c->check('word|3'));
         $this->assertFalse($c->check(' word1'));
