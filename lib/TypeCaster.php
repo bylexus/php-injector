@@ -1,8 +1,17 @@
 <?php
+/**
+ * PhpInjector
+ *
+ * @author Alexander Schenkel, alex@alexi.ch
+ * @copyright 2015 Alexander Schenkel
+ * @link https://github.com/bylexus/php-injector
+ *
+ * released under the MIT license, @link http://opensource.org/licenses/MIT
+ */
 namespace PhpInjector {
 	class TypeCaster {
 		public static function cast($value, $type) {
-			// strip away my own namespace from type:			
+			// strip away my own namespace from type:
 			$type = preg_replace('/^\\\\{0,1}'.__NAMESPACE__.'\\\\/', '', $type);
 			switch (strtolower($type)) {
 				case 'boolean':
@@ -20,5 +29,5 @@ namespace PhpInjector {
 			}
 			throw new \Exception('Cannot (yet) cast to type '.$type);
 		}
-	}	
+	}
 }

@@ -1,5 +1,22 @@
 <?php
+/**
+ * PhpInjector
+ *
+ * @author Alexander Schenkel, alex@alexi.ch
+ * @copyright 2015 Alexander Schenkel
+ * @link https://github.com/bylexus/php-injector
+ *
+ * released under the MIT license, @link http://opensource.org/licenses/MIT
+ */
 namespace PhpInjector {
+
+    /**
+     * The PhpInjector class allows the user to call functions / methods and inject
+     * parameters via associative array. It also allows the developer to force parameter
+     * type casting and parameter condition checks.
+     *
+     * See the readme on @link https://github.com/bylexus/php-injector Github for examples and usage.
+     */
 	class Injector {
 		const TYPE_FUNC = 'function';
 		const TYPE_METHOD = 'method';
@@ -34,17 +51,34 @@ namespace PhpInjector {
 			$this->_parameters = $this->parseFunctionParams($this->_reflectionFunction->getParameters());
 		}
 
+        /**
+         * Returns the instance of the ReflectionFunction / ReflectionMethod reflection class
+         * instantiated during the construction.
+         *
+         * @return \ReflectionFunctionAbstract
+         */
 		public function getReflectionFunction() {
 			return $this->_reflectionFunction;
 		}
 
+        /**
+         * Returns the name of the function to be injected
+         *
+         * @return string
+         */
 		public function getFunction() {
 			return $this->_function;
 		}
 
+        /**
+         * Returns the name of the object method to be injected
+         *
+         * @return string
+         */
 		public function getObject() {
 			return $this->_object;
 		}
+
 
 		protected function initOptions(array $options = null) {
 			if (is_array($options)) {
@@ -128,6 +162,15 @@ namespace PhpInjector {
 			}
 		}
 
+        /**
+         * returns an array with parameters found in a docblock string, in the form
+         * "@param <type>[condition] $<name> ..."
+         *
+         * @return array An associative array with the following keys:
+         *    - type: an array of types found (e.g. array('int','int','string'))
+         *    - condition: an array of conditions, e.g. array('1..10','>0','a|b|c')
+         *    - varname: an array of variable names, e.g. array('a','myVar','d')
+         */
 		protected function matchParams($docComment) {
 			$matches = array();
 			preg_match_all(
@@ -159,6 +202,8 @@ namespace PhpInjector {
 		 * If a parameter, which is expected to be present is not
 		 * in the $params array, an exception is thrown.
 		 *
+         * @param array $args An associative array containing the parameters and values
+         *     for the function to be called, e.g.: array('a'=>1, 'b'=>'Alex')
 		 * @return mixed The result of the calling function / method
 		 */
 		public function invoke(array $args = null) {

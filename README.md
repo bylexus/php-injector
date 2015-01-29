@@ -240,7 +240,7 @@ require_once('vendor/autoload.php');
 
 // Function to use for injection:
 function fact($n) {
-    if ($n > 1) { 
+    if ($n > 1) {
         return $n*fact($n-1);
     } else return 1;
 }
@@ -258,12 +258,12 @@ require_once('vendor/autoload.php');
 // Function to use for injection: DocBlock defines the casting type:
 /**
  * calculates the factorial of n.
- * 
+ *
  * @param int $n The value to calculate the factorial from
  */
 function fact($n) {
     // here, $n is casted to an int:
-    if ($n > 1) { 
+    if ($n > 1) {
         return $n*fact($n-1);
     } else return 1;
 }
@@ -281,12 +281,12 @@ require_once('vendor/autoload.php');
 // Function to use for injection: DocBlock defines the casting type and condition:
 /**
  * calculates the factorial of n.
- * 
+ *
  * @param int[>0] $n The value to calculate the factorial from
  */
 function fact($n) {
     // here, $n is casted to an int. An exception is thrown when $n is < 1.
-    if ($n > 1) { 
+    if ($n > 1) {
         return $n*fact($n-1);
     } else return 1;
 }
@@ -315,6 +315,12 @@ Developing
 or manually, using PHPUnit:
 
 <code>php phpunit.phar ./tests</code>
+
+
+License
+---------
+
+Licensed under the MIT license, copyright 2015 Alexander Schenkel
 
 
 TODO

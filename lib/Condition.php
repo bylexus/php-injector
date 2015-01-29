@@ -1,4 +1,13 @@
 <?php
+/**
+ * PhpInjector
+ *
+ * @author Alexander Schenkel, alex@alexi.ch
+ * @copyright 2015 Alexander Schenkel
+ * @link https://github.com/bylexus/php-injector
+ *
+ * released under the MIT license, @link http://opensource.org/licenses/MIT
+ */
 namespace PhpInjector {
 	abstract class Condition {
 		protected $_compareFunctions;
@@ -7,7 +16,16 @@ namespace PhpInjector {
 		protected $_conditionString;
 
 
-
+        /**
+         * Returns the specific instance of a Condition class, depending on the given
+         * data type.
+         *
+         * @param string $type The data type, e.g. 'int'
+         * @param string $conditionString, e.g. '1..100'
+         * @param array $additionalCompareFunctions add your own compare function.
+         *    @see StringCondition for an example / layout of the array.
+         * @return Condition The specific Condition instance
+         */
 		public static function getCondition($type, $conditionString, array $additionalCompareFunctions = null) {
 			switch (strtolower($type)) {
 				case 'int':
@@ -53,7 +71,7 @@ namespace PhpInjector {
 			$this->_compareFunction = null;
 			foreach($this->_compareFunctions as $pattern => $func) {
 				$matches = array();
-				if (preg_match($pattern,$conditionString,$matches)) {
+				if (preg_match_all($pattern,$conditionString,$matches)) {
 					$this->_matches = $matches;
 					$this->_compareFunction = $func;
 					break;

@@ -18,9 +18,7 @@ class StringConditionTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException Exception
 	 */
 	public function test_ConstuctWithError() {
-		new \PhpInjector\StringCondition(' -5.51..100');
-		new \PhpInjector\StringCondition(' >= -29');
-		new \PhpInjector\StringCondition(' -5.51..100');
+		new \PhpInjector\StringCondition('');
 	}
 
 	public function test_check_range() {
@@ -80,4 +78,14 @@ class StringConditionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($c->check('123'));
 		$this->assertFalse($c->check('öäü'));
 	}
+
+    public function test_check_wordlist() {
+        $c = new \PhpInjector\StringCondition('word1| word 2 |word\|3');
+        $this->assertTrue($c->check('word1'));
+        $this->assertTrue($c->check(' word 2 '));
+        $this->assertTrue($c->check('word|3'));
+        $this->assertFalse($c->check(' word1'));
+        $this->assertFalse($c->check('another'));
+        $this->assertFalse($c->check('word|5'));
+    }
 }
