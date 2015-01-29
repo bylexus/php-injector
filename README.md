@@ -229,6 +229,8 @@ This defines some conditions for the input parameters. If they do not match, an 
     - For numbers: e.g. <code>int[1..100]</code>: Input value must be between 1 to 100 (including 1 and 100)
     - For strings: e.g. <code>string[5..20]</code>: Input must be at least 5 characters, but max. 20 characters long
     - For timestamps: e.g. <code>timestamp[1.1.2000..31.12.2010]</code>: Input date must be within the given date range
+* <code>word1[[|word2]...]</code>: Input string must contain one of the words.
+  Example: <code>@param string[word1|word2|word3] $str</code>
 
 Examples
 -----------
