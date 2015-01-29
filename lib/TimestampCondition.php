@@ -13,7 +13,7 @@ namespace PhpInjector {
 		protected function getInternalCompareFunctions() {
 			return array(
 			// matches e.g. '1.1.2000..2014/12/22' (or, better, almost everything that strtotime can handle):
-			'/^(?P<min>.+(?<!\.))\.\.(?P<max>[^\.]+)/' => function($testValue, $matches) {
+			'/^(?P<min>.+(?<!\.))\.\.(?P<max>.+)/' => function($testValue, $matches) {
 					$min = strtotime($matches['min'][0]);
 					$max = strtotime($matches['max'][0]);
 					$testValue = strtotime($testValue);

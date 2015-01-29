@@ -6,15 +6,8 @@ class TimestampConditionTest extends \PHPUnit_Framework_TestCase {
 		new \PhpInjector\TimestampCondition(' >= 20140101');
 	}
 
-	/**
-	 * @expectedException Exception
-	 */
-	public function test_ConstuctWithError() {
-		new \PhpInjector\TimestampCondition(' now...hulahu');
-	}
-
 	public function test_check_range() {
-		$c = new \PhpInjector\TimestampCondition(' 1.1.2000..20001231');
+		$c = new \PhpInjector\TimestampCondition(' 1.1.2000..31.12.2000');
 
 		$this->assertTrue($c->check('2000-01-01'));
 		$this->assertTrue($c->check('12/31/2000'));
