@@ -5,20 +5,38 @@ class StringConditionTest extends \PHPUnit_Framework_TestCase {
 		mb_internal_encoding("UTF-8");
 	}
 
-	public function test_Construct() {
-		new \PhpInjector\StringCondition(' 0..100');
-		new \PhpInjector\StringCondition(' 2..100');
-		new \PhpInjector\StringCondition('<20');
-		new \PhpInjector\StringCondition(' <= 20 ');
-		new \PhpInjector\StringCondition('>  20');
-		new \PhpInjector\StringCondition('>=20');
+	public function constructDataProvider() {
+		return array(
+			array(' 0..100'),
+			array(' 2..100'),
+			array('<20'),
+			array(' <= 20 '),
+			array('>  20'),
+			array('>=20')
+		);
+	}
+
+	public function constructFailDataProvider() {
+		return array(
+			array(null),
+			array(''),
+			array('   ')
+		);
+	}
+
+	/**
+	 * @dataProvider constructDataProvider
+	 */
+	public function test_Construct($condition) {
+		new \PhpInjector\StringCondition($condition);
 	}
 
 	/**
 	 * @expectedException Exception
+	 * @dataProvider constructFailDataProvider
 	 */
-	public function test_ConstuctWithError() {
-		new \PhpInjector\StringCondition('');
+	public function test_ConstuctWithError($condition) {
+		new \PhpInjector\StringCondition($condition);
 	}
 
 	public function test_check_range() {
