@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bylexus/php-injector.svg)](https://travis-ci.org/bylexus/php-injector)
+
 php-injector
 ============
 
