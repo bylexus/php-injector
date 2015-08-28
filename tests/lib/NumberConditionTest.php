@@ -60,5 +60,12 @@ class NumberConditionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($c->check(-2.5));
 		$this->assertTrue($c->check(-2.6));
 		$this->assertTrue($c->check(-2.4));
+
+        $c = new \PhpInjector\NumberCondition('>0');
+        $this->assertFalse($c->check(0));
+        $this->assertFalse($c->check(-2.6));
+        $this->assertTrue($c->check(1));
+
+        $this->assertFalse($c->check('abc'));
 	}
 }

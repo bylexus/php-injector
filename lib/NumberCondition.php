@@ -14,15 +14,15 @@ namespace PhpInjector {
 			return array(
 			// matches e.g. '-1.0..100':
 			'/^(?P<min>-?\d+(\.\d+)*)\.\.(?P<max>-?\d+(\.\d+)*)/' => function($testValue, $matches) {
-					$min = $matches['min'][0];
-					$max = $matches['max'][0];
+					$min = (float)$matches['min'][0];
+					$max = (float)$matches['max'][0];
 					return $min <= $testValue && $max >= $testValue;
 				},
 
 			// matches e.g. '<= -1':
 			'/^(?P<op>[<>]=?|<>)\s*(?P<border>-?\d+(\.\d+)*)/' => function($testValue, $matches) {
 					$op = $matches['op'][0];
-					$border = $matches['border'][0];
+					$border = (float)$matches['border'][0];
 					switch ($op) {
 						case '<': return $testValue < $border;
 						case '<=': return $testValue <= $border;

@@ -106,6 +106,14 @@ class InjectorIntegrationTest extends \PHPUnit_Framework_TestCase {
     /**
      * @expectedException Exception
      */
+    public function test_typecasting_function_with_string_a() {
+        $inj = new \PhpInjector\Injector('IntegrationTest_typecasting_function_with_conditions');
+        $ret = $inj->invoke(array('b'=>'fuenf', 'a' => 'aaalex'));
+    }
+
+    /**
+     * @expectedException Exception
+     */
     public function test_typecasting_function_with_condition_with_condition_exception() {
         $inj = new \PhpInjector\Injector('IntegrationTest_typecasting_function_with_conditions');
         $ret = $inj->invoke(array('b'=>'1234', 'a' => 0));
@@ -200,6 +208,15 @@ class InjectorIntegrationTest extends \PHPUnit_Framework_TestCase {
 
         $ret = $inj->invoke(array('b'=>'1234567890', 'a' => 1000));
         $this->assertSame(array(1000,'1234567890',null,true),$ret);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function test_typecasting_method_with_condition_and_wrong_a() {
+        $obj = new IntegrationTest_TestClass();
+        $inj = new \PhpInjector\Injector(array($obj,'IntegrationTest_typecasting_function_with_conditions'));
+        $ret = $inj->invoke(array('b'=>'1234', 'a' => 'hello'));
     }
 
     /**
