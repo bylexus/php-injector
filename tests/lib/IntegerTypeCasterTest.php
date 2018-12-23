@@ -19,7 +19,6 @@ class IntegerTypeCasterTest extends TestCase
         $this->assertSame(-1, \PhpInjector\IntegerTypeCaster::cast('-1'));
         $this->assertSame(2, \PhpInjector\IntegerTypeCaster::cast('2'));
         $this->assertSame(-2, \PhpInjector\IntegerTypeCaster::cast('-2'));
-        $this->assertSame(2, \PhpInjector\IntegerTypeCaster::cast('2.5e+3'));
         $this->assertSame(0, \PhpInjector\IntegerTypeCaster::cast("Slex 2"));
         $this->assertSame(2, \PhpInjector\IntegerTypeCaster::cast("2tousand"));
 
