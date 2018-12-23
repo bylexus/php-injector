@@ -350,7 +350,7 @@ $ret = $injector->invoke(array('n'=>4.5)); // 24
 
 You can even use native PHP functions:
 ```php
-$inj = \PhpInjector\Injector('strtolower');
+$inj = new \PhpInjector\Injector('strtolower');
 echo $inj->invoke(array('str'=>'HEY, WHY AM I SMALL?'));
 ```
 
@@ -369,7 +369,7 @@ function processRequest(\Psr\Http\Request $req, $param1, $param2) {
 To call this function, you can use the Invoker as follows:
 
 ```php
-$inj = \PhpInjector\Injector('processRequest');
+$inj = new \PhpInjector\Injector('processRequest');
 echo $inj->invoke(['Psr\Http\Request' => new Request(), 'param1' => 'foo', 'param2' => 'bar']);
 ```
 
