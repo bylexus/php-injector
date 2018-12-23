@@ -42,10 +42,10 @@ namespace PhpInjector {
             if (is_string($functionOrMethod)) {
                 $this->initFunction($functionOrMethod);
                 $this->_reflectionFunction = $this->buildFunctionReflector($this->_function);
-            } else if ($functionOrMethod instanceof \Closure) {
+            } elseif ($functionOrMethod instanceof \Closure) {
                 $this->initClosure($functionOrMethod);
                 $this->_reflectionFunction = $this->buildFunctionReflector($this->_function);
-            } else if (is_array($functionOrMethod)) {
+            } elseif (is_array($functionOrMethod)) {
                 $this->initMethod($functionOrMethod);
                 $this->_reflectionFunction = $this->buildMethodReflector($this->_object, $this->_function);
             } else {
@@ -146,7 +146,7 @@ namespace PhpInjector {
                     'name' => $param->getName(),
                     'position' => $param->getPosition(),
                     'optional' => $param->isOptional(),
-                    'type' => null,
+                    'type' => $param->getType(),
                     'condition' => null,
                     'default_value' => ($param->isDefaultValueAvailable() ? $param->getDefaultValue() : null),
                 );
@@ -166,7 +166,9 @@ namespace PhpInjector {
             $matches = $this->matchParams($docComment);
             foreach ($matches['varname'] as $key => $varname) {
                 if (!empty($matches['type'][$key]) && isset($paramInfo[$varname])) {
-                    $paramInfo[$varname]['type'] = $matches['type'][$key];
+                    if (!isset($paramInfo[$varname]['type'])) {
+                        $paramInfo[$varname]['type'] = $matches['type'][$key];
+                    }
                     $conditionStr = (!empty($matches['condition'][$key]) ? $matches['condition'][$key] : null);
                     if ($conditionStr) {
                         $cond = Condition::getCondition($paramInfo[$varname]['type'], $conditionStr);
@@ -191,7 +193,8 @@ namespace PhpInjector {
             preg_match_all(
                 '/@param\s+(?P<type>\w+)(\[(?P<condition>.*)\])*\s+\$(?P<varname>\w+)/',
                 $docComment,
-                $matches);
+                $matches
+            );
             return $matches;
         }
 
@@ -211,8 +214,16 @@ namespace PhpInjector {
          * with parameter name / value pairs. The order does not
          * matter, the parameters are injected in the correct order.
          *
+         * The parameters are invoked depinding on the given arguments. The
+         * arguments are always a key => value pair:
+         * - either a parameter name => value
+         * - or a Class name => value
+         *
+         * If the parameter can be found by name, it takes precedence.
+         * Then it is checked if a parameter with the given Class name can be found.
+         *
          * If the type of the expected parameter could be parsed,
-         * the value is casted to that type.
+         * the value is casted to that type (for non-class types).
          *
          * If a parameter, which is expected to be present is not
          * in the $params array, an exception is thrown.
@@ -234,7 +245,7 @@ namespace PhpInjector {
             if ($this->_reflectionFunction instanceof \ReflectionFunction) {
                 $ret = $this->_reflectionFunction->invokeArgs($callParams);
                 return $this->_reflectionFunction->invokeArgs($callParams);
-            } else if ($this->_reflectionFunction instanceof \ReflectionMethod) {
+            } elseif ($this->_reflectionFunction instanceof \ReflectionMethod) {
                 return $this->_reflectionFunction->invokeArgs($this->_object, $callParams);
             } else {
                 throw new \Exception('Oops: Fatal: the callee you delivered seems not to be a function or method.');
@@ -245,10 +256,17 @@ namespace PhpInjector {
         {
             $name = $expectedParam['name'];
             $position = $expectedParam['position'];
+            $type = $expectedParam['type'];
             $value = null;
             if (array_key_exists($name, $params)) {
                 $value = $params[$name];
                 unset($params[$name]);
+            } elseif ($type instanceof \ReflectionType) {
+                // only non-builtin types can be injected by class:
+                if ($type->isBuiltin() !== true) {
+                    $value = $this->findParamValueWithType($params, $type);
+                    unset($params[$name]);
+                }
             } else {
                 if ($expectedParam['optional']) {
                     $value = $expectedParam['default_value'];
@@ -262,11 +280,27 @@ namespace PhpInjector {
                 $this->checkParameterValidity($value, $expectedParam, $cond);
             }
 
-            if (!empty($expectedParam['type'])) {
+
+            if ($expectedParam['type'] instanceof \ReflectionType && $expectedParam['type']->isBuiltin() !== true) {
+                $callParams[$position] = $value;
+            } elseif (!empty($expectedParam['type'])) {
                 $callParams[$position] = TypeCaster::cast($value, $expectedParam['type']);
             } else {
                 $callParams[$position] = $value;
             }
+        }
+
+        /**
+         * finds a parameter that matches the given class type. Needed for object injection.
+         */
+        protected function findParamValueWithType($params, $type)
+        {
+            foreach ($params as $typeName => $value) {
+                if (is_object($value) && $typeName === (string)$type) {
+                    return $value;
+                }
+            }
+            return null;
         }
 
         protected function checkParameterValidity($value, $expectedParam, Condition $cond)

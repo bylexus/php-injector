@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
  * @param int $cee A cee param
  * @param string $a Something
  */
-function myFancyFunctionUnderTest($a, $b, $cee = 5, $dee = 'hello')
+function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello')
 {
     return array(
         'a' => $a,
@@ -22,7 +22,7 @@ class AFancyClassUnderTest
      * @param string $a Something
      * @param int[>0] $b
      */
-    public function myFancyFunctionUnderTest($a, $b, $cee = 5, $dee = 'hello')
+    public function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello')
     {
         return array(
             'a' => $a,
@@ -36,6 +36,18 @@ class AFancyClassUnderTest
     {
         return $a;
     }
+}
+
+/**
+ * @param AFancyClassUnderTest $obj
+ * @param float $zahl
+ */
+function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObject $ao) {
+    return [
+        'AFancyClassUnderTest' => $obj,
+        'zahl' => $zahl,
+        'ArrayObject' => $ao
+    ];
 }
 
 class InjectorTest extends TestCase
@@ -282,26 +294,64 @@ class InjectorTest extends TestCase
         $inj = new \PhpInjector\Injector('myFancyFunctionUnderTest');
         $ret = $inj->invoke(array(
             'dee' => 'ddd',
-            'b' => 'bbb',
+            'b' => "3.5",
             'cee' => '55',
             'a' => 'aaa',
         ));
         $this->assertSame(array(
             'a' => 'aaa',
-            'b' => 'bbb',
+            'b' => 3.5,
             'cee' => 55,
             'dee' => 'ddd',
         ), $ret);
 
         $ret = $inj->invoke(array(
-            'b' => 'bbb',
+            'b' => '4.5',
             'a' => 'aaa',
         ));
         $this->assertSame(array(
             'a' => 'aaa',
-            'b' => 'bbb',
+            'b' => 4.5,
             'cee' => 5,
             'dee' => 'hello',
         ), $ret);
+    }
+
+    public function test_FindParamValueWithType()
+    {
+        $mock = $this->getMockBuilder('\PhpInjector\Injector')
+            ->disableOriginalConstructor()
+            ->setMethods(array())
+            ->getMock();
+        $inst = new AFancyClassUnderTest();
+        $params = [[
+            'zahl' => 5.5,
+            'AFancyClassUnderTest' => $inst
+        ], AFancyClassUnderTest::class];
+
+        $findParamValueWithType = $this->getMethod($mock, 'findParamValueWithType');
+        $ret = $findParamValueWithType->invokeArgs($mock, $params);
+
+        $this->assertSame($inst, $ret);
+    }
+
+    public function test_invokeWithClassInjection()
+    {
+        $i = new \PhpInjector\Injector('objectInjectionFunction');
+        $obj = new AFancyClassUnderTest();
+        $ao = new ArrayObject([1,2,3]);
+        $zahl = 5.5;
+        $ret = $i->invoke([
+            'ArrayObject' => $ao,
+            'AFancyClassUnderTest' => $obj,
+            'zahl' => $zahl
+        ]);
+        $exp = [
+            'AFancyClassUnderTest' => $obj,
+            'zahl' => 5,
+            'ArrayObject' => $ao
+        ];
+
+        $this->assertEquals($exp, $ret);
     }
 }

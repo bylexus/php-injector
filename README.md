@@ -14,6 +14,7 @@ Features
 * helps you to make parameter validation / conversion. Especially useful when
   used in frontend-faced Controllers.
 * Check input variable for matching conditions (e.g. string length, number in a certain range, date > now etc...)
+* Can be used to inject parameters by name as well as by Class type
 
 Installation
 ------------
@@ -30,6 +31,30 @@ $injector = new \PhpInjector\Injector('myfunction');
 
 Summary
 ------------
+
+The PHP Injector helps you calling functions / methods with parameter injection.
+There are two use cases for this application:
+
+* to call functions / methods in a Dependency Injection scenario
+* to invoke a function with request parameters, but to have a check mechanism in place
+
+### Scenario: Dependency Injection
+
+In Dependency Injection scenarios, a developing user want to request a service
+from a dependency injection container. The easiest way is to allow the developer to
+just state the service type as function argument:
+
+```php
+public function myFunction(Request $request) {
+    $param = $request->input('param);
+}
+```
+
+The Request object in this case gets magically injected by the surrounding framework.
+This is where PHPInjector comes into play: It allows the framework builder to
+inject the requested services.
+
+### Scenario: Web Request parameter injection
 
 Under some circumstances it is needed or wanted to call a function
 not directly but to "collect" the parameters somehow dynamically and
@@ -156,6 +181,27 @@ $ret = $injector->invoke(array(
 ```
 
 In this example, the <code>teaser</code> function / methods will be called with the <code>$text</code>, the <code>$maxlen = 10</code> and the <code>$tail = '...'</code> arguments.
+
+### Injecting by Class types (Object injection)
+
+If you want to match parameters by Class type (not by parameter name), you just type-hint the class:
+
+```php
+function doSome(\Psr\Http\Message $message) {
+    // do something with the $message object
+}
+```
+
+This method can be invoked as follows:
+
+```php
+$injector = new \PhpInjector\Injector('doSome');
+$ret = $injector->invoke(array(
+    'Psr\Http\Message' => new HttpMessage()
+);
+```
+
+Note that you have to provide the full namespaced class name for a match in the parameter array.
 
 ### Force type casting / parameter conditions
 
@@ -308,6 +354,24 @@ $inj = \PhpInjector\Injector('strtolower');
 echo $inj->invoke(array('str'=>'HEY, WHY AM I SMALL?'));
 ```
 
+### Inject class objects
+
+You can also inject class object by type name, instead of variable name. This is exceptionnaly useful if you want to
+implement a Dependency Injection framework within your calls:
+
+```php
+// Function that receives an object of type 'Psr\Http\Request':
+function processRequest(\Psr\Http\Request $req, $param1, $param2) {
+    // process Request
+}
+```
+
+To call this function, you can use the Invoker as follows:
+
+```php
+$inj = \PhpInjector\Injector('processRequest');
+echo $inj->invoke(['Psr\Http\Request' => new Request(), 'param1' => 'foo', 'param2' => 'bar']);
+```
 
 Developing
 -----------
@@ -324,7 +388,7 @@ or manually, using PHPUnit:
 License
 ---------
 
-Licensed under the MIT license, copyright 2015 Alexander Schenkel
+Licensed under the MIT license, copyright 2015-2019 Alexander Schenkel
 
 
 TODO
