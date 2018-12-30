@@ -13,10 +13,10 @@
 
     "require": {
         "php" : ">= 7.0",
-        "ext-mbstring" : "*",
-        "phpunit/phpunit": "^6.5"
+        "ext-mbstring" : "*"
     },
     "require-dev": {
+        "phpunit/phpunit": "^6.5"
     },
     "autoload": {
         "psr-4": {
