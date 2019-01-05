@@ -15,6 +15,7 @@ Features
   used in frontend-faced Controllers.
 * Check input variable for matching conditions (e.g. string length, number in a certain range, date > now etc...)
 * Can be used to inject parameters by name as well as by Class type
+* Supports resolving parameters from a PSR-11 Service Container
 
 Installation
 ------------
@@ -371,6 +372,36 @@ To call this function, you can use the Invoker as follows:
 ```php
 $inj = new \PhpInjector\Injector('processRequest');
 echo $inj->invoke(['Psr\Http\Request' => new Request(), 'param1' => 'foo', 'param2' => 'bar']);
+```
+
+### Inject services from a PSR-11 Service Container
+
+You can provide a [PSR-11 Service Container](https://www.php-fig.org/psr/psr-11/) if the method's type signature requests a Service class from such a service container. This is especially useful in Dependency Injection scenarios:
+
+```php
+use MyServices\FooService;
+
+// Function that receives an object of type 'Psr\Http\Request':
+function processRequest(FooService $myService, $param1) {
+    $myService->doSome($param1);
+}
+```
+To call this function, you can use the Invoker as follows:
+
+```php
+// Service container with available service, created / intantiated elswhere:
+$container = get_the_PSR_11_Service_container();
+$container->registerService(new FooService());
+
+// Now just give the service container in the options array:
+$inj = new \PhpInjector\Injector('processRequest', ['service_container' => $container]);
+echo $inj->invoke(['param1' => 'foo']);
+
+
+// Or, optionally, set the service container later:
+$inj = new \PhpInjector\Injector('processRequest');
+$inj->setServiceContainer($container);
+echo $inj->invoke(['param1' => 'foo']);
 ```
 
 Developing

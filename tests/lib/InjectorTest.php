@@ -42,12 +42,27 @@ class AFancyClassUnderTest
  * @param AFancyClassUnderTest $obj
  * @param float $zahl
  */
-function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObject $ao) {
+function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObject $ao)
+{
     return [
         'AFancyClassUnderTest' => $obj,
         'zahl' => $zahl,
-        'ArrayObject' => $ao
+        'ArrayObject' => $ao,
     ];
+}
+
+class TestServiceContainer implements \Psr\Container\ContainerInterface
+{
+    public $service = null;
+    public $hasService = true;
+    public function get($id)
+    {
+        return $this->service;
+    }
+    public function has($id)
+    {
+        return $this->hasService;
+    }
 }
 
 class InjectorTest extends TestCase
@@ -326,7 +341,7 @@ class InjectorTest extends TestCase
         $inst = new AFancyClassUnderTest();
         $params = [[
             'zahl' => 5.5,
-            'AFancyClassUnderTest' => $inst
+            'AFancyClassUnderTest' => $inst,
         ], AFancyClassUnderTest::class];
 
         $findParamValueWithType = $this->getMethod($mock, 'findParamValueWithType');
@@ -339,18 +354,93 @@ class InjectorTest extends TestCase
     {
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $obj = new AFancyClassUnderTest();
-        $ao = new ArrayObject([1,2,3]);
+        $ao = new ArrayObject([1, 2, 3]);
         $zahl = 5.5;
         $ret = $i->invoke([
             'ArrayObject' => $ao,
             'AFancyClassUnderTest' => $obj,
-            'zahl' => $zahl
+            'zahl' => $zahl,
         ]);
         $exp = [
             'AFancyClassUnderTest' => $obj,
             'zahl' => 5,
-            'ArrayObject' => $ao
+            'ArrayObject' => $ao,
         ];
+
+        $this->assertEquals($exp, $ret);
+    }
+
+    public function test_SetServiceContainerViaParam()
+    {
+        $sc = $this->getMockBuilder('TestServiceContainer')
+                    ->setMethods(['has', 'get'])
+                    ->getMock();
+        $obj = new AFancyClassUnderTest();
+        $i = new \PhpInjector\Injector('objectInjectionFunction', ['service_container' => $sc]);
+        $this->assertSame($sc, $i->getServiceContainer());
+        $this->assertTrue($i->hasServiceContainer());
+    }
+
+    public function test_SetServiceContainer()
+    {
+        $sc = $this->getMockBuilder('TestServiceContainer')
+                    ->setMethods(['has', 'get'])
+                    ->getMock();
+        $obj = new AFancyClassUnderTest();
+        $i = new \PhpInjector\Injector('objectInjectionFunction');
+        $i->setServiceContainer($sc);
+        $this->assertSame($sc, $i->getServiceContainer());
+        $this->assertTrue($i->hasServiceContainer());
+    }
+
+    public function test_injectsServiceFromContainer()
+    {
+        $i = new \PhpInjector\Injector('objectInjectionFunction');
+        $sc = $this->getMockBuilder('TestServiceContainer')
+                    ->setMethods(['has', 'get'])
+                    ->getMock();
+        $obj = new AFancyClassUnderTest();
+        $ao = new ArrayObject([1, 2, 3]);
+        $zahl = 5.5;
+        $exp = [
+            'AFancyClassUnderTest' => $obj,
+            'zahl' => 5,
+            'ArrayObject' => $ao,
+        ];
+
+        $sc->method('has')->willReturn(true);
+        $sc->method('get')->willReturn($obj);
+        $i->setServiceContainer($sc);
+
+        $ret = $i->invoke([
+            'ArrayObject' => $ao,
+            'zahl' => $zahl,
+        ]);
+
+        $this->assertEquals($exp, $ret);
+    }
+
+    public function test_injectsServiceFromRealContainer()
+    {
+        $i = new \PhpInjector\Injector('objectInjectionFunction');
+        $sc = new TestServiceContainer();
+        $obj = new AFancyClassUnderTest();
+        $ao = new ArrayObject([1, 2, 3]);
+        $zahl = 5.5;
+        $exp = [
+            'AFancyClassUnderTest' => $obj,
+            'zahl' => 5,
+            'ArrayObject' => $ao,
+        ];
+
+        $sc->hasService = true;
+        $sc->service = $obj;
+        $i->setServiceContainer($sc);
+
+        $ret = $i->invoke([
+            'ArrayObject' => $ao,
+            'zahl' => $zahl,
+        ]);
 
         $this->assertEquals($exp, $ret);
     }

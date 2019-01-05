@@ -8,7 +8,10 @@
  *
  * released under the MIT license, @link http://opensource.org/licenses/MIT
  */
+
 namespace PhpInjector {
+
+    use Psr\Container\ContainerInterface;
 
     /**
      * The PhpInjector class allows the user to call functions / methods and inject
@@ -27,6 +30,7 @@ namespace PhpInjector {
         protected $_type = null;
         protected $_reflectionFunction = null;
         protected $_parameters = array();
+        protected $_serviceContainer = null;
 
         public $allowUnknownParams = true;
 
@@ -86,13 +90,34 @@ namespace PhpInjector {
             return $this->_object;
         }
 
+        /**
+         * Known options:
+         * - allow_unknown_params: boolean: True to allow parameters not required in the method's signature
+         * - service_container: Psr\Container\ContainerInterface A service container to resolve params / Services
+         */
         protected function initOptions(array $options = null)
         {
-            if (is_array($options)) {
-                if (isset($options['allow_unknown_params'])) {
-                    $this->allowUnknownParams = BooleanTypeCaster::cast($options['allow_unknown_params']);
-                }
+            if (isset($options['allow_unknown_params'])) {
+                $this->allowUnknownParams = BooleanTypeCaster::cast($options['allow_unknown_params']);
             }
+            if (isset($options['service_container'])) {
+                $this->setServiceContainer($options['service_container']);
+            }
+        }
+
+        public function setServiceContainer(ContainerInterface $container)
+        {
+            $this->_serviceContainer = $container;
+        }
+
+        public function getServiceContainer()
+        {
+            return $this->_serviceContainer;
+        }
+
+        public function hasServiceContainer()
+        {
+            return $this->_serviceContainer instanceof ContainerInterface;
         }
 
         protected function initFunction($funcName)
@@ -280,7 +305,6 @@ namespace PhpInjector {
                 $this->checkParameterValidity($value, $expectedParam, $cond);
             }
 
-
             if ($expectedParam['type'] instanceof \ReflectionType && $expectedParam['type']->isBuiltin() !== true) {
                 $callParams[$position] = $value;
             } elseif (!empty($expectedParam['type'])) {
@@ -295,9 +319,16 @@ namespace PhpInjector {
          */
         protected function findParamValueWithType($params, $type)
         {
+            $type = (string) $type;
             foreach ($params as $typeName => $value) {
-                if (is_object($value) && $typeName === (string)$type) {
+                if (is_object($value) && $typeName === $type) {
                     return $value;
+                }
+            }
+            // Not found in param array, so check for a service container:
+            if ($this->hasServiceContainer()) {
+                if ($this->getServiceContainer()->has($type)) {
+                    return $this->getServiceContainer()->get($type);
                 }
             }
             return null;
