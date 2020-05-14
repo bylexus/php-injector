@@ -5,8 +5,7 @@ use PHPUnit\Framework\TestCase;
  * @param int $cee A cee param
  * @param string $a Something
  */
-function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello')
-{
+function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello') {
     return array(
         'a' => $a,
         'b' => $b,
@@ -15,15 +14,13 @@ function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello')
     );
 }
 
-class AFancyClassUnderTest
-{
+class AFancyClassUnderTest {
     /**
      * @param int $cee A cee param
      * @param string $a Something
      * @param int[>0] $b
      */
-    public function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello')
-    {
+    public function myFancyFunctionUnderTest($a, float $b, $cee = 5, $dee = 'hello') {
         return array(
             'a' => $a,
             'b' => $b,
@@ -32,8 +29,7 @@ class AFancyClassUnderTest
         );
     }
 
-    private function myPrivateFancyFunctionUnderTest($a)
-    {
+    private function myPrivateFancyFunctionUnderTest($a) {
         return $a;
     }
 }
@@ -42,8 +38,7 @@ class AFancyClassUnderTest
  * @param AFancyClassUnderTest $obj
  * @param float $zahl
  */
-function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObject $ao)
-{
+function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObject $ao) {
     return [
         'AFancyClassUnderTest' => $obj,
         'zahl' => $zahl,
@@ -51,32 +46,26 @@ function objectInjectionFunction(AFancyClassUnderTest $obj, int $zahl, \ArrayObj
     ];
 }
 
-class TestServiceContainer implements \Psr\Container\ContainerInterface
-{
+class TestServiceContainer implements \Psr\Container\ContainerInterface {
     public $service = null;
     public $hasService = true;
-    public function get($id)
-    {
+    public function get($id) {
         return $this->service;
     }
-    public function has($id)
-    {
+    public function has($id) {
         return $this->hasService;
     }
 }
 
-class InjectorTest extends TestCase
-{
-    protected static function getMethod($object, $name)
-    {
+class InjectorTest extends TestCase {
+    protected static function getMethod($object, $name) {
         $class = new ReflectionClass($object);
         $method = $class->getMethod($name);
         $method->setAccessible(true);
         return $method;
     }
 
-    public function test_initOptions()
-    {
+    public function test_initOptions() {
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -91,11 +80,8 @@ class InjectorTest extends TestCase
         $this->assertFalse($inj->allowUnknownParams);
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function test_initFunctionNull()
-    {
+    public function test_initFunctionNull() {
+        $this->expectException(\Exception::class);
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,11 +89,8 @@ class InjectorTest extends TestCase
         $initFunction->invoke($inj, null);
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function test_initFunctionNotfound()
-    {
+    public function test_initFunctionNotfound() {
+        $this->expectException(\Exception::class);
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,8 +98,7 @@ class InjectorTest extends TestCase
         $initFunction->invoke($inj, 'jdhfhsdfgfhfhffhjfhjfhjshjhfjhfs');
     }
 
-    public function test_initFunctionGood()
-    {
+    public function test_initFunctionGood() {
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -125,8 +107,7 @@ class InjectorTest extends TestCase
         $this->assertEquals('myFancyFunctionUnderTest', $ret);
     }
 
-    public function test_initClosure()
-    {
+    public function test_initClosure() {
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -135,11 +116,8 @@ class InjectorTest extends TestCase
         $this->assertInstanceof('Closure', $ret);
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function test_initMethodNull()
-    {
+    public function test_initMethodNull() {
+        $this->expectException(\Exception::class);
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -147,11 +125,8 @@ class InjectorTest extends TestCase
         $initMethod->invoke($inj, array());
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function test_initMethodNoObject()
-    {
+    public function test_initMethodNoObject() {
+        $this->expectException(\Exception::class);
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -159,11 +134,8 @@ class InjectorTest extends TestCase
         $initMethod->invoke($inj, array(null, 'myFancyFunctionUnderTest'));
     }
 
-    /**
-     * @expectedException Exception
-     */
-    public function test_initMethodNoMethod()
-    {
+    public function test_initMethodNoMethod() {
+        $this->expectException(\Exception::class);
         $o = new AFancyClassUnderTest();
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
@@ -172,8 +144,7 @@ class InjectorTest extends TestCase
         $initMethod->invoke($inj, array($o, 'unknown'));
     }
 
-    public function test_initMethod()
-    {
+    public function test_initMethod() {
         $o = new AFancyClassUnderTest();
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
@@ -184,8 +155,7 @@ class InjectorTest extends TestCase
         $this->assertSame('myFancyFunctionUnderTest', $ret[1]);
     }
 
-    public function test_BuildMethodReflector()
-    {
+    public function test_BuildMethodReflector() {
         $o = new AFancyClassUnderTest();
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
@@ -199,8 +169,7 @@ class InjectorTest extends TestCase
         $this->assertEquals('hello', $good);
     }
 
-    public function test_BuildFunctionReflector()
-    {
+    public function test_BuildFunctionReflector() {
         $inj = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -209,8 +178,7 @@ class InjectorTest extends TestCase
         $this->assertInstanceof('ReflectionFunction', $res);
     }
 
-    public function test_parseFunctionParams()
-    {
+    public function test_parseFunctionParams() {
         $mock = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->setMethods(array('extractTypeInfos', 'getReflectionFunction'))
@@ -247,8 +215,7 @@ class InjectorTest extends TestCase
         ), $ret);
     }
 
-    public function test_ExtractTypeInfos()
-    {
+    public function test_ExtractTypeInfos() {
         $params = array(
             'a' => array(),
             'b' => array(),
@@ -266,13 +233,13 @@ class InjectorTest extends TestCase
         ));
 
         $extractTypeInfos = $this->getMethod($mock, 'extractTypeInfos');
-        $ret = $extractTypeInfos->invokeArgs($mock, array('', &$params));
-
-        $this->assertTrue(true, $ret);
+        $extractTypeInfos->invokeArgs($mock, array('', &$params));
+        foreach ($params as $param) {
+            $this->assertTrue(count($param) > 0);
+        }
     }
 
-    public function test_MatchParams()
-    {
+    public function test_MatchParams() {
         $comment = '
 		/**
 		 * This is a doc comment.
@@ -304,8 +271,7 @@ class InjectorTest extends TestCase
         $this->assertSame('', $ret['condition'][3]);
     }
 
-    public function test_InvokeWithFunction()
-    {
+    public function test_InvokeWithFunction() {
         $inj = new \PhpInjector\Injector('myFancyFunctionUnderTest');
         $ret = $inj->invoke(array(
             'dee' => 'ddd',
@@ -332,8 +298,7 @@ class InjectorTest extends TestCase
         ), $ret);
     }
 
-    public function test_FindParamValueWithType()
-    {
+    public function test_FindParamValueWithType() {
         $mock = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
             ->setMethods(array())
@@ -350,8 +315,7 @@ class InjectorTest extends TestCase
         $this->assertSame($inst, $ret);
     }
 
-    public function test_invokeWithClassInjection()
-    {
+    public function test_invokeWithClassInjection() {
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $obj = new AFancyClassUnderTest();
         $ao = new ArrayObject([1, 2, 3]);
@@ -370,22 +334,20 @@ class InjectorTest extends TestCase
         $this->assertEquals($exp, $ret);
     }
 
-    public function test_SetServiceContainerViaParam()
-    {
+    public function test_SetServiceContainerViaParam() {
         $sc = $this->getMockBuilder('TestServiceContainer')
-                    ->setMethods(['has', 'get'])
-                    ->getMock();
+            ->setMethods(['has', 'get'])
+            ->getMock();
         $obj = new AFancyClassUnderTest();
         $i = new \PhpInjector\Injector('objectInjectionFunction', ['service_container' => $sc]);
         $this->assertSame($sc, $i->getServiceContainer());
         $this->assertTrue($i->hasServiceContainer());
     }
 
-    public function test_SetServiceContainer()
-    {
+    public function test_SetServiceContainer() {
         $sc = $this->getMockBuilder('TestServiceContainer')
-                    ->setMethods(['has', 'get'])
-                    ->getMock();
+            ->setMethods(['has', 'get'])
+            ->getMock();
         $obj = new AFancyClassUnderTest();
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $i->setServiceContainer($sc);
@@ -393,12 +355,11 @@ class InjectorTest extends TestCase
         $this->assertTrue($i->hasServiceContainer());
     }
 
-    public function test_injectsServiceFromContainer()
-    {
+    public function test_injectsServiceFromContainer() {
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $sc = $this->getMockBuilder('TestServiceContainer')
-                    ->setMethods(['has', 'get'])
-                    ->getMock();
+            ->setMethods(['has', 'get'])
+            ->getMock();
         $obj = new AFancyClassUnderTest();
         $ao = new ArrayObject([1, 2, 3]);
         $zahl = 5.5;
@@ -420,8 +381,7 @@ class InjectorTest extends TestCase
         $this->assertEquals($exp, $ret);
     }
 
-    public function test_injectsServiceFromRealContainer()
-    {
+    public function test_injectsServiceFromRealContainer() {
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $sc = new TestServiceContainer();
         $obj = new AFancyClassUnderTest();

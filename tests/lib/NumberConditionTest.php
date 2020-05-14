@@ -18,11 +18,9 @@ class NumberConditionTest extends TestCase
         $this->assertInstanceOf(\PhpInjector\NumberCondition::class, $i);
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function test_ConstuctWithError()
     {
+        $this->expectException(\Exception::class);
         new \PhpInjector\NumberCondition(' -5.51...100');
     }
 

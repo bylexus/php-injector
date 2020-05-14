@@ -7,10 +7,13 @@ php-injector
 
 Features
 ---------
-* allows you to invoke functions / methods with a parameter array
+
+* Dependency Injection: Meant to use as a helper library in a dependency injection mechanism
+  to call your functions / methods with the needed parameters
+* allows invocation of functions / methods with a parameter array matching the function's parameters
 * extracts the parameters (and their names) from the function / method signature
 * extracts the parameter's default values form the function / method signature
-* Define types and even conditions in a simple DocBlock format
+* Allows the user to define types and even conditions in a simple DocBlock format, if needed
 * helps you to make parameter validation / conversion. Especially useful when
   used in frontend-faced Controllers.
 * Check input variable for matching conditions (e.g. string length, number in a certain range, date > now etc...)
@@ -37,7 +40,7 @@ The PHP Injector helps you calling functions / methods with parameter injection.
 There are two use cases for this application:
 
 * to call functions / methods in a Dependency Injection scenario
-* to invoke a function with request parameters, but to have a check mechanism in place
+* to invoke a function with request parameters, but with a type check mechanism in place
 
 ### Scenario: Dependency Injection
 
@@ -76,7 +79,8 @@ function storePersonInfo($name, $age, $active = false) {
 $res = storePersonInfo($_REQUEST);
 ```
 
-Now everyone cries "Booooh! Don't use request parameters as function parameters!". And right your are.
+**Now THAT is certainly a bad idea**! Don't use request parameters as function parameters directly!
+All kind of bad things can happen here (injections, remote code invocation ...).
 
 This is where the Injector comes into play: It allows you to:
 
@@ -415,19 +419,13 @@ or manually, using PHPUnit:
 
 <code>php phpunit.phar ./tests</code>
 
+Compatibility
+--------------
+
+* V1.0.0: PHP >= 7.0 is needed
+* V1.2.0: PHP >= 7.2 is needed
 
 License
 ---------
 
-Licensed under the MIT license, copyright 2015-2019 Alexander Schenkel
-
-
-TODO
------------------
-a lot to do, not yet done, initial commit only. Here's what to expect later on:
-
-* define own conditions
-* fail on wrong/unsupported parameters
-* throw specific errors
-* ...
-
+Licensed under the MIT license, copyright 2015-2020 Alexander Schenkel

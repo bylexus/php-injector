@@ -1,16 +1,13 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-class StringConditionTest extends TestCase
-{
+class StringConditionTest extends TestCase {
 
-    public function setUp()
-    {
+    public function setUp(): void {
         mb_internal_encoding("UTF-8");
     }
 
-    public function constructDataProvider()
-    {
+    public function constructDataProvider() {
         return array(
             array(' 0..100'),
             array(' 2..100'),
@@ -21,8 +18,7 @@ class StringConditionTest extends TestCase
         );
     }
 
-    public function constructFailDataProvider()
-    {
+    public function constructFailDataProvider() {
         return array(
             array(null),
             array(''),
@@ -33,23 +29,20 @@ class StringConditionTest extends TestCase
     /**
      * @dataProvider constructDataProvider
      */
-    public function test_Construct($condition)
-    {
+    public function test_Construct($condition) {
         $i = new \PhpInjector\StringCondition($condition);
         $this->assertInstanceOf(\PhpInjector\StringCondition::class, $i);
     }
 
     /**
-     * @expectedException Exception
      * @dataProvider constructFailDataProvider
      */
-    public function test_ConstuctWithError($condition)
-    {
+    public function test_ConstuctWithError($condition) {
+        $this->expectException(\Exception::class);
         new \PhpInjector\StringCondition($condition);
     }
 
-    public function test_check_range()
-    {
+    public function test_check_range() {
         $c = new \PhpInjector\StringCondition(' 1..10');
 
         $this->assertTrue($c->check('1'));
@@ -62,8 +55,7 @@ class StringConditionTest extends TestCase
         $this->assertFalse($c->check('12345678901'));
     }
 
-    public function test_check_operator()
-    {
+    public function test_check_operator() {
         $c = new \PhpInjector\StringCondition('> 2');
         $this->assertTrue($c->check('123'));
         $this->assertTrue($c->check('12ä'));
@@ -108,8 +100,7 @@ class StringConditionTest extends TestCase
         $this->assertFalse($c->check('öäü'));
     }
 
-    public function test_check_wordlist()
-    {
+    public function test_check_wordlist() {
         $c = new \PhpInjector\StringCondition('word1| WORD 2 |word\|3');
         $this->assertTrue($c->check('wOrD1'));
         $this->assertTrue($c->check(' word 2 '));

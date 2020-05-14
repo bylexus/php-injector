@@ -1,26 +1,21 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-class OctUnitTestClass
-{
+class OctUnitTestClass {
     public $a = 1;
 }
 
-class ObjectTypeCasterTest extends TestCase
-{
-    public function setUp()
-    {
+class ObjectTypeCasterTest extends TestCase {
+    public function setUp(): void {
         $this->obj = new stdClass();
     }
 
-    protected function setObj($key, $value)
-    {
+    protected function setObj($key, $value) {
         $this->obj->{$key} = $value;
         return $this->obj;
     }
 
-    public function test_cast()
-    {
+    public function test_cast() {
         $this->assertSame($this->setObj('scalar', 0)->scalar, \PhpInjector\ObjectTypeCaster::cast(0)->scalar);
         $this->assertSame($this->setObj('scalar', -1)->scalar, \PhpInjector\ObjectTypeCaster::cast(-1)->scalar);
         $this->assertSame($this->setObj('scalar', 2500.0)->scalar, \PhpInjector\ObjectTypeCaster::cast(2.5e+3)->scalar);

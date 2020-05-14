@@ -3,7 +3,7 @@
  * PhpInjector
  *
  * @author Alexander Schenkel, alex@alexi.ch
- * @copyright 2015 Alexander Schenkel
+ * @copyright 2015-2020 Alexander Schenkel
  * @link https://github.com/bylexus/php-injector
  *
  * released under the MIT license, @link http://opensource.org/licenses/MIT
@@ -20,8 +20,7 @@ namespace PhpInjector {
      *
      * See the readme on @link https://github.com/bylexus/php-injector Github for examples and usage.
      */
-    class Injector
-    {
+    class Injector {
         const TYPE_FUNC = 'function';
         const TYPE_METHOD = 'method';
 
@@ -40,8 +39,7 @@ namespace PhpInjector {
          *           to create the injector from
          * @param array $options (TBD)
          */
-        public function __construct($functionOrMethod, array $options = null)
-        {
+        public function __construct($functionOrMethod, array $options = null) {
             $this->initOptions($options);
             if (is_string($functionOrMethod)) {
                 $this->initFunction($functionOrMethod);
@@ -65,8 +63,7 @@ namespace PhpInjector {
          *
          * @return \ReflectionFunctionAbstract
          */
-        public function getReflectionFunction()
-        {
+        public function getReflectionFunction() {
             return $this->_reflectionFunction;
         }
 
@@ -75,8 +72,7 @@ namespace PhpInjector {
          *
          * @return string
          */
-        public function getFunction()
-        {
+        public function getFunction() {
             return $this->_function;
         }
 
@@ -85,8 +81,7 @@ namespace PhpInjector {
          *
          * @return string
          */
-        public function getObject()
-        {
+        public function getObject() {
             return $this->_object;
         }
 
@@ -95,8 +90,7 @@ namespace PhpInjector {
          * - allow_unknown_params: boolean: True to allow parameters not required in the method's signature
          * - service_container: Psr\Container\ContainerInterface A service container to resolve params / Services
          */
-        protected function initOptions(array $options = null)
-        {
+        protected function initOptions(array $options = null) {
             if (isset($options['allow_unknown_params'])) {
                 $this->allowUnknownParams = BooleanTypeCaster::cast($options['allow_unknown_params']);
             }
@@ -105,23 +99,19 @@ namespace PhpInjector {
             }
         }
 
-        public function setServiceContainer(ContainerInterface $container)
-        {
+        public function setServiceContainer(ContainerInterface $container) {
             $this->_serviceContainer = $container;
         }
 
-        public function getServiceContainer()
-        {
+        public function getServiceContainer() {
             return $this->_serviceContainer;
         }
 
-        public function hasServiceContainer()
-        {
+        public function hasServiceContainer() {
             return $this->_serviceContainer instanceof ContainerInterface;
         }
 
-        protected function initFunction($funcName)
-        {
+        protected function initFunction($funcName) {
             if (function_exists($funcName)) {
                 $this->_function = $funcName;
             } else {
@@ -129,14 +119,12 @@ namespace PhpInjector {
             }
             return $this->_function;
         }
-        protected function initClosure(\Closure $func)
-        {
+        protected function initClosure(\Closure $func) {
             $this->_function = $func;
             return $this->_function;
         }
 
-        protected function initMethod(array $objInfo)
-        {
+        protected function initMethod(array $objInfo) {
             if (count($objInfo) !== 2) {
                 throw new \Exception('Object or method not found.');
             }
@@ -151,20 +139,17 @@ namespace PhpInjector {
             return array($this->_object, $this->_function);
         }
 
-        protected function buildMethodReflector($object, $function)
-        {
+        protected function buildMethodReflector($object, $function) {
             $m = new \ReflectionMethod($object, $function);
             $m->setAccessible(true);
             return $m;
         }
 
-        protected function buildFunctionReflector($function)
-        {
+        protected function buildFunctionReflector($function) {
             return new \ReflectionFunction($function);
         }
 
-        protected function parseFunctionParams(array $params)
-        {
+        protected function parseFunctionParams(array $params) {
             $info = array();
             foreach ($params as $param) {
                 $info[$param->getName()] = array(
@@ -186,8 +171,7 @@ namespace PhpInjector {
          *
          * Looks for doc comments like "@param <type> <varname> ....".
          */
-        protected function extractTypeInfos($docComment, &$paramInfo)
-        {
+        protected function extractTypeInfos($docComment, &$paramInfo) {
             $matches = $this->matchParams($docComment);
             foreach ($matches['varname'] as $key => $varname) {
                 if (!empty($matches['type'][$key]) && isset($paramInfo[$varname])) {
@@ -212,8 +196,7 @@ namespace PhpInjector {
          *    - condition: an array of conditions, e.g. array('1..10','>0','a|b|c')
          *    - varname: an array of variable names, e.g. array('a','myVar','d')
          */
-        protected function matchParams($docComment)
-        {
+        protected function matchParams($docComment) {
             $matches = array();
             preg_match_all(
                 '/@param\s+(?P<type>\w+)(\[(?P<condition>.*)\])*\s+\$(?P<varname>\w+)/',
@@ -228,8 +211,7 @@ namespace PhpInjector {
          *
          * @return array An associative array containing 'param_name' => array() elements with the detected parameters
          */
-        public function getInputParameters()
-        {
+        public function getInputParameters() {
             return $this->_parameters;
         }
 
@@ -257,8 +239,7 @@ namespace PhpInjector {
          *     for the function to be called, e.g.: array('a'=>1, 'b'=>'Alex')
          * @return mixed The result of the calling function / method
          */
-        public function invoke(array $args = null)
-        {
+        public function invoke(array $args = null) {
             $callParams = array();
             foreach ($this->_parameters as $expectedParam) {
                 $this->assignCallParam($expectedParam, $args, $callParams);
@@ -277,8 +258,7 @@ namespace PhpInjector {
             }
         }
 
-        protected function assignCallParam($expectedParam, &$params, &$callParams)
-        {
+        protected function assignCallParam($expectedParam, &$params, &$callParams) {
             $name = $expectedParam['name'];
             $position = $expectedParam['position'];
             $type = $expectedParam['type'];
@@ -317,9 +297,12 @@ namespace PhpInjector {
         /**
          * finds a parameter that matches the given class type. Needed for object injection.
          */
-        protected function findParamValueWithType($params, $type)
-        {
-            $type = (string) $type;
+        protected function findParamValueWithType($params, $type) {
+            if ($type instanceof \ReflectionNamedType) {
+                $type = $type->getName();
+            } else {
+                $type = (string) $type;
+            }
             foreach ($params as $typeName => $value) {
                 if (is_object($value) && $typeName === $type) {
                     return $value;
@@ -334,8 +317,7 @@ namespace PhpInjector {
             return null;
         }
 
-        protected function checkParameterValidity($value, $expectedParam, Condition $cond)
-        {
+        protected function checkParameterValidity($value, $expectedParam, Condition $cond) {
             $result = $cond->check($value);
             if ($result !== true) {
                 if ($expectedParam['optional'] && $value == null) {
