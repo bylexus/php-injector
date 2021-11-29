@@ -1,4 +1,5 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -52,7 +53,7 @@ class TestServiceContainer implements \Psr\Container\ContainerInterface {
     public function get($id) {
         return $this->service;
     }
-    public function has($id) {
+    public function has($id): bool {
         return $this->hasService;
     }
 }
@@ -112,7 +113,8 @@ class InjectorTest extends TestCase {
             ->disableOriginalConstructor()
             ->getMock();
         $initClosure = $this->getMethod($inj, 'initClosure');
-        $ret = $initClosure->invoke($inj, function () {});
+        $ret = $initClosure->invoke($inj, function () {
+        });
         $this->assertInstanceof('Closure', $ret);
     }
 
@@ -181,7 +183,7 @@ class InjectorTest extends TestCase {
     public function test_parseFunctionParams() {
         $mock = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
-            ->setMethods(array('extractTypeInfos', 'getReflectionFunction'))
+            ->onlyMethods(array('extractTypeInfos', 'getReflectionFunction'))
             ->getMock();
         $mock->method('getReflectionFunction')->willReturn(new ReflectionFunction('myFancyFunctionUnderTest'));
 
@@ -224,7 +226,7 @@ class InjectorTest extends TestCase {
         );
         $mock = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
-            ->setMethods(array('matchParams'))
+            ->onlyMethods(array('matchParams'))
             ->getMock();
         $mock->method('matchParams')->willReturn(array(
             'varname' => array('a', 'b', 'c', 'd'),
@@ -301,7 +303,7 @@ class InjectorTest extends TestCase {
     public function test_FindParamValueWithType() {
         $mock = $this->getMockBuilder('\PhpInjector\Injector')
             ->disableOriginalConstructor()
-            ->setMethods(array())
+            ->onlyMethods(array())
             ->getMock();
         $inst = new AFancyClassUnderTest();
         $params = [[
@@ -336,7 +338,7 @@ class InjectorTest extends TestCase {
 
     public function test_SetServiceContainerViaParam() {
         $sc = $this->getMockBuilder('TestServiceContainer')
-            ->setMethods(['has', 'get'])
+            ->onlyMethods(['has', 'get'])
             ->getMock();
         $obj = new AFancyClassUnderTest();
         $i = new \PhpInjector\Injector('objectInjectionFunction', ['service_container' => $sc]);
@@ -346,7 +348,7 @@ class InjectorTest extends TestCase {
 
     public function test_SetServiceContainer() {
         $sc = $this->getMockBuilder('TestServiceContainer')
-            ->setMethods(['has', 'get'])
+            ->onlyMethods(['has', 'get'])
             ->getMock();
         $obj = new AFancyClassUnderTest();
         $i = new \PhpInjector\Injector('objectInjectionFunction');
@@ -358,7 +360,7 @@ class InjectorTest extends TestCase {
     public function test_injectsServiceFromContainer() {
         $i = new \PhpInjector\Injector('objectInjectionFunction');
         $sc = $this->getMockBuilder('TestServiceContainer')
-            ->setMethods(['has', 'get'])
+            ->onlyMethods(['has', 'get'])
             ->getMock();
         $obj = new AFancyClassUnderTest();
         $ao = new ArrayObject([1, 2, 3]);

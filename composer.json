@@ -1,23 +1,24 @@
 {
     "name": "bylexus/php-injector",
-    "description": "A Function / Method parameter injection helper",
+    "description": "A Function / Method parameter injection helper. Makes your Dependency Injection work.",
     "homepage": "https://github.com/bylexus/php-injector",
+    "version": "2.0.0",
     "authors": [
         {
             "name": "Alexander Schenkel",
             "email": "alex@alexi.ch",
-            "homepage": "http://www.alexi.ch/",
+            "homepage": "https://www.alexi.ch/",
             "role": "Developer"
         }
     ],
 
     "require": {
-        "php" : ">= 7.2",
+        "php" : ">= 7.4",
         "ext-mbstring" : "*",
-        "psr/container": "^1.0"
+        "psr/container": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {

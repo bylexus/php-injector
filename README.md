@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/bylexus/php-injector.svg)](https://travis-ci.org/bylexus/php-injector)
+![Tests](https://github.com/bylexus/php-injector/actions/workflows/run-tests.yml/badge.svg)
 
 php-injector
 ============
 
-> a parameter injector for functions / object methods
+> A Function / Method parameter injection helper. Makes your Dependency Injection work.
 
 Features
 ---------
@@ -424,8 +424,9 @@ Compatibility
 
 * V1.0.0: PHP >= 7.0 is needed
 * V1.2.0: PHP >= 7.2 is needed
+* V2.0.0: PHP >= 7.4 is needed
 
 License
 ---------
 
-Licensed under the MIT license, copyright 2015-2020 Alexander Schenkel
+Licensed under the MIT license, copyright 2015-2021 Alexander Schenkel
