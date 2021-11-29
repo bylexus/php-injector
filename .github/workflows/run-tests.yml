@@ -2,6 +2,7 @@ name: Run Unit Tests on PHP 7.4
 on: [push]
 jobs:
   test:
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
