@@ -1,18 +1,52 @@
 ![Tests](https://github.com/bylexus/php-injector/actions/workflows/run-tests.yml/badge.svg)
 
-php-injector
-============
+# php-injector
 
-> A Function / Method parameter injection helper. Makes your Dependency Injection work.
+> A Function / Method parameter injection and Class autowire helper. Makes your Dependency Injection work.
 
-Features
----------
+- [Features](#features)
+- [Installation](#installation)
+- [Summary - Method / Function invocation](#summary-method-function-invocation)
+  - [Scenario: Dependency Injection](#scenario-dependency-injection)
+  - [Scenario: Web Request parameter injection](#scenario-web-request-parameter-injection)
+- [Function / Method definition](#function-method-definition)
+  - [No type casting / conditions](#no-type-casting-conditions)
+  - [Injecting by Class types (Object injection)](#injecting-by-class-types-object-injection)
+  - [Force type casting / parameter conditions](#force-type-casting-parameter-conditions)
+    - [DocBlock Comment syntax](#docblock-comment-syntax)
+    - [Supported types](#supported-types)
+    - [Using parameter conditions](#using-parameter-conditions)
+    - [Available conditions](#available-conditions)
+- [Summary - AutoWiring of Classes](#summary-autowiring-of-classes)
+  - [Using manual parameters for class construction](#using-manual-parameters-for-class-construction)
+- [Examples - Function / Method injection](#examples-function-method-injection)
+  - [Simple function parameter injection](#simple-function-parameter-injection)
+  - [Parameter injection with type casting](#parameter-injection-with-type-casting)
+  - [Parameter injection with type casting and conditions](#parameter-injection-with-type-casting-and-conditions)
+  - [using native PHP functions](#using-native-php-functions)
+  - [Inject class objects](#inject-class-objects)
+  - [Inject services from a PSR-11 Service Container](#inject-services-from-a-psr-11-service-container)
+- [Examples - Auto-Wiring classes](#examples-auto-wiring-classes)
+  - [Simple Auto-Wiring](#simple-auto-wiring)
+  - [Auto-Wiring with manual parameters](#auto-wiring-with-manual-parameters)
+  - [Auto-Wiring with a PSR-11 Service Container](#auto-wiring-with-a-psr-11-service-container)
+- [Developing](#developing)
+  - [setup dev env](#setup-dev-env)
+  - [run unit tests](#run-unit-tests)
+- [Compatibility](#compatibility)
+- [Changelog](#changelog)
+  - [V3.0.0](#v300)
+- [License](#license)
+
+
+## Features
 
 * Dependency Injection: Meant to use as a helper library in a dependency injection mechanism
   to call your functions / methods with the needed parameters
 * allows invocation of functions / methods with a parameter array matching the function's parameters
-* extracts the parameters (and their names) from the function / method signature
-* extracts the parameter's default values form the function / method signature
+* allows 'auto-wiring' of classes by injecting dependant constructor parameters upon instantiation
+* extracts the parameters (and their names) from the function / method / constructor signature
+* extracts the parameter's default values form the function / method / constructor signature
 * Allows the user to define types and even conditions in a simple DocBlock format, if needed
 * helps you to make parameter validation / conversion. Especially useful when
   used in frontend-faced Controllers.
@@ -20,8 +54,7 @@ Features
 * Can be used to inject parameters by name as well as by Class type
 * Supports resolving parameters from a PSR-11 Service Container
 
-Installation
-------------
+## Installation
 
 via [Composer](https://getcomposer.org/):
 
@@ -30,11 +63,16 @@ via [Composer](https://getcomposer.org/):
 Then just use the composer's autoload facility:
 ```php
 require_once('vendor/autoload.php');
+
+// Method invocation:
 $injector = new \PhpInjector\Injector('myfunction');
+
+// Class autowiring:
+$aw = new \PhpInjector\AutoWire($diContainer);
+$serviceA = $aw->createInstance(ServiceA::class);
 ```
 
-Summary
-------------
+## Summary - Method / Function invocation
 
 The PHP Injector helps you calling functions / methods with parameter injection.
 There are two use cases for this application:
@@ -137,9 +175,7 @@ $injectStore = new Injector(array($controller,'storePersonInfo'));
 $res = $injectStore->invoke($_REQUEST);
 ```
 
-
-Function / Method definition
------------------------------
+## Function / Method definition
 
 ### No type casting / conditions
 
@@ -285,8 +321,91 @@ This defines some conditions for the input parameters. If they do not match, an 
 * <code>word1[[|word2]...]</code>: Input string must contain one of the words.
   Example: <code>@param string[word1|word2|word3] $str</code>
 
-Examples
------------
+## Summary - AutoWiring of Classes
+
+AutoWiring is useful if you have service classes that depend on other services. For example:
+
+```php
+// ServiceB is independant
+class ServiceB {}
+
+// ServiceA depends on ServiceB:
+class ServiceA {
+    public ServiceB $b;
+    public function __construct(ServiceB $b) {
+        $this->b = $b;
+    }
+}
+```
+
+In this scenario, `ServiceA` can only be instantiated by retrieving `ServiceB` as its constructor parameter.
+This is a typical use case in Dependency Injection scenarios.
+
+The `AutoWire` class helps you resolve the dependencies and instantiate a dependant class:
+
+```php
+use PhpInjector\AutoWire;
+ 
+ $aw = new AutoWire();
+ // In this case, ServiceB will also be instantiated and injected:
+ $instA = $aw->createInstance(ClassNameA::class);
+```
+
+If you're using a Dependency Injection container, you can use auto-wiring while setting up service instances:
+
+```php
+use PhpInjector\AutoWire;
+
+// a PSR-11-compatible service container:
+$container = new Container();
+
+
+// register the container with the AutoWire class:
+$aw = new AutoWire($container);
+
+// register ServiceB, which is independant. We could just use `new ServiceB()` here,
+// but we can also ask the AutoWire class to create an instance:
+// This makes the instantiation of ServiceB future-proof, e.g.
+// if ServiceB becomes a dependant of a ServiceC in the future:
+$container->set(ServiceB::class, $aw->createInstance(ServiceB::class));
+
+// register ServiceA, while ServiceB is fetched from the containe:
+$container->set(ServiceA::class, $aw->createInstance(ServiceA::class));
+```
+
+### Using manual parameters for class construction
+
+Sometimes a class needs more than just other services in the constructor. Consider the following class:
+
+```php
+class ServiceC {
+    private $b;
+    private $name;
+    private $isActive;
+    public function __construct(ServiceB $b, string $name, bool $isActive) {
+        $this->b = $b;
+        $this->name = $name;
+        $this->isActive = $isActive;
+    }
+}
+```
+
+Here, `$name` and `$isActive` cannot be determined as a `type` or service to be injected.
+In this cases, you can use additional parameters when auto-wiring a class:
+
+```php
+use PhpInjector\AutoWire;
+
+$aw = new AutoWire($container);
+$instC = $aw->createInstance(ServiceC::class, [
+    'isActive' => true,
+    'name' => 'Alex',
+]);
+```
+
+The additional parameters are passed to the constructor of the class, if the name matches.
+
+## Examples - Function / Method injection
 
 ### Simple function parameter injection
 
@@ -408,25 +527,131 @@ $inj->setServiceContainer($container);
 echo $inj->invoke(['param1' => 'foo']);
 ```
 
-Developing
------------
+## Examples - Auto-Wiring classes
+
+### Simple Auto-Wiring
+
+In its simplest form, you don't need a DI container, it's enough if the dependant classes
+exists. In this case, AutoWire just instantiates those classes:
+
+```php
+use PhpInjector\AutoWire;
+
+class ServiceA {}
+class ServiceB {
+    public function __construct(ServiceA $a) {}
+}
+
+$aw = new AutoWire();
+// here, ServiceA is just instantiated with "new ServiceA()", along with ServiceB:
+$b = $aw->createInstance(ServiceB::class);
+```
+
+### Auto-Wiring with manual parameters
+
+If you don't have a service container, or want to deliver additional constructor arguments manually,
+you can just provide a parameter array:
+
+```php
+use PhpInjector\AutoWire;
+
+class ServiceA {}
+class ServiceB {
+    public function __construct(ServiceA $a, string $name) {}
+}
+
+$aw = new AutoWire();
+// here, ServiceA is just instantiated with "new ServiceA()", along with ServiceB:
+$b = $aw->createInstance(ServiceB::class, [
+    'name' => 'foo',
+    new ServiceA(),
+]);
+```
+
+Here, `$name` is found by name in the parameter array, while `$a` is found by its Type declaration:
+the parameter array is searched for a matching type, and assigned.
+
+
+### Auto-Wiring with a PSR-11 Service Container
+
+If you're using a PSR-11 compatible dependency injection container, you can use it for
+AutoWire to lookup its dependencies:
+
+```php
+use PhpInjector\AutoWire;
+
+// ServiceB is independant
+class ServiceB {}
+
+// ServiceA depends on ServiceB:
+class ServiceA {
+    public ServiceB $b;
+    public function __construct(ServiceB $b) {
+        $this->b = $b;
+    }
+}
+
+// a PSR-11-compatible service container:
+$container = new Container();
+
+// register the container with the AutoWire class:
+$aw = new AutoWire($container);
+
+// ServiceB is indepenadnt
+$container->set(ServiceB::class, new ServiceB());
+
+// register ServiceA, while ServiceB is fetched from the containe:
+$container->set(ServiceA::class, $aw->createInstance(ServiceA::class));
+```
+
+## Developing
+
+### setup dev env
+
+```shell
+# Without docker:
+$ git clone git@github.com:bylexus/php-injector.git
+$ cd php-injector
+$ composer install
+$ composer test
+```
+
+```shell
+# With docker:
+$ git clone git@github.com:bylexus/php-injector.git
+$ cd php-injector
+$ docker build -t php-injector docker/
+$ docker run --name php-injector -ti -v "$(pwd):/src" php-injector bash
+docker> composer install
+docker> composer test
+```
 
 ### run unit tests
 
-<code>composer test</code>
+```shell
+$ composer test
+```
 
 or manually, using PHPUnit:
 
-<code>php phpunit.phar ./tests</code>
+```shell
+$ php vendor/bin/phpunit ./tests
+```
 
-Compatibility
---------------
+## Compatibility
 
 * V1.0.0: PHP >= 7.0 is needed
 * V1.2.0: PHP >= 7.2 is needed
 * V2.0.0: PHP >= 7.4 is needed
+* V3.0.0: PHP >= 8.0 is needed
 
-License
----------
+## Changelog
+
+### V3.0.0
+
+- [breaking] non-accessible class methods can no longer be called (previously allowed even for private methods)
+- [feature] Introducing AutoWire: create class instances by injecting constructor parameters automagically
+
+## License
 
 Licensed under the MIT license, copyright 2015-2021 Alexander Schenkel
