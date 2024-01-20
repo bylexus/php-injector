@@ -7,7 +7,7 @@ class StringConditionTest extends TestCase {
         mb_internal_encoding("UTF-8");
     }
 
-    public function constructDataProvider() {
+    public static function constructDataProvider() {
         return array(
             array(' 0..100'),
             array(' 2..100'),
@@ -18,7 +18,7 @@ class StringConditionTest extends TestCase {
         );
     }
 
-    public function constructFailDataProvider() {
+    public static function constructFailDataProvider() {
         return array(
             array(null),
             array(''),

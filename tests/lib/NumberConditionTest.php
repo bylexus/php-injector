@@ -1,11 +1,10 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 
-class NumberConditionTest extends TestCase
-{
+class NumberConditionTest extends TestCase {
 
-    public function test_Construct()
-    {
+    public function test_Construct() {
         $i = new \PhpInjector\NumberCondition(' -5.51..100');
         $this->assertInstanceOf(\PhpInjector\NumberCondition::class, $i);
         $i = new \PhpInjector\NumberCondition('<-1.0');
@@ -18,14 +17,12 @@ class NumberConditionTest extends TestCase
         $this->assertInstanceOf(\PhpInjector\NumberCondition::class, $i);
     }
 
-    public function test_ConstuctWithError()
-    {
+    public function test_ConstuctWithError() {
         $this->expectException(\Exception::class);
         new \PhpInjector\NumberCondition(' -5.51...100');
     }
 
-    public function test_check_range()
-    {
+    public function test_check_range() {
         $c = new \PhpInjector\NumberCondition(' -5.51..100.25');
 
         $this->assertTrue($c->check(-5.51));
@@ -37,8 +34,7 @@ class NumberConditionTest extends TestCase
         $this->assertFalse($c->check(101));
     }
 
-    public function test_check_operator()
-    {
+    public function test_check_operator() {
         $c = new \PhpInjector\NumberCondition('> -2.5');
         $this->assertTrue($c->check(-2));
         $this->assertTrue($c->check(2));

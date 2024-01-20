@@ -45,7 +45,7 @@ namespace PhpInjector {
 		}
 
 		public function __construct($conditionString, array $additionalCompareFunctions = null) {
-			$this->_conditionString = trim($conditionString);
+			$this->_conditionString = trim($conditionString ?? '');
 			$this->_compareFunctions = $this->getInternalCompareFunctions();
 			if (is_array($additionalCompareFunctions)) {
 				$this->addAdditionalCompareFunctions($additionalCompareFunctions);
