@@ -1,15 +1,31 @@
 name: Run Unit Tests on PHP 7.4
 on: [push]
 jobs:
-  test:
-    runs-on: ubuntu-20.04
+  test-php74:
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
             php-version: '7.4'
+
+      - name: Install dependencies
+        run: composer install --no-progress
+
+      - name: Run tests
+        run: composer test
+
+  test-php81:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+            php-version: '8.1'
 
       - name: Install dependencies
         run: composer install --no-progress
