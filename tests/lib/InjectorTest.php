@@ -30,7 +30,7 @@ class AFancyClassUnderTest {
         );
     }
 
-    private function myPrivateFancyFunctionUnderTest($a) {
+    public function myOtherFancyFunctionUnderTest($a) {
         return $a;
     }
 }
@@ -163,10 +163,10 @@ class InjectorTest extends TestCase {
             ->disableOriginalConstructor()
             ->getMock();
         $buildMethodReflector = $this->getMethod($inj, 'buildMethodReflector');
-        $ret = $buildMethodReflector->invoke($inj, $o, 'myPrivateFancyFunctionUnderTest');
+        $ret = $buildMethodReflector->invoke($inj, $o, 'myOtherFancyFunctionUnderTest');
         $this->assertInstanceof('ReflectionMethod', $ret);
 
-        // Test private accessibility:
+        // Test invocation:
         $good = $ret->invoke($o, 'hello');
         $this->assertEquals('hello', $good);
     }

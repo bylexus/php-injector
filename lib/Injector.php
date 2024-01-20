@@ -13,7 +13,9 @@
 namespace PhpInjector;
 
 use Psr\Container\ContainerInterface;
+use InvalidArgumentException;
 use ReflectionFunction;
+use ReflectionFunctionAbstract;
 use ReflectionMethod;
 
 /**
@@ -29,8 +31,7 @@ class Injector {
 
     protected $object = null;
     protected $fn = null;
-    // protected $_type = null;
-    protected ReflectionFunction|ReflectionMethod|null $reflectionFn = null;
+    protected ReflectionFunctionAbstract|null $reflectionFn = null;
     protected array $parameters = array();
     protected ?ContainerInterface $serviceContainer = null;
 
@@ -40,7 +41,9 @@ class Injector {
      * @param string|array $functionOrMethod A name of a function (string, e.g 'myFunc') or an
      *           array with an object / method (e.g array($myObj, 'myMethod'))
      *           to create the injector from
-     * @param array $options (TBD)
+     * @param array $options An array of options. Known options are:
+     *   - allow_unknown_params: boolean: True to allow parameters not required in the method's signature
+     *   - service_container: Psr\Container\ContainerInterface A service container to resolve params / Services
      */
     public function __construct($functionOrMethod, array $options = null) {
         $this->initOptions($options);
@@ -54,7 +57,7 @@ class Injector {
             $this->initMethod($functionOrMethod);
             $this->reflectionFn = $this->buildMethodReflector($this->object, $this->fn);
         } else {
-            throw new \Exception('string or array needed in constructor.');
+            throw new InvalidArgumentException('string or array needed in constructor.');
         }
 
         $this->parameters = $this->parseFunctionParams($this->reflectionFn->getParameters());
@@ -118,7 +121,7 @@ class Injector {
         if ($funcName && function_exists($funcName)) {
             $this->fn = $funcName;
         } else {
-            throw new \Exception('Function not found: ' . $funcName);
+            throw new InvalidArgumentException('Function not found: ' . $funcName);
         }
         return $this->fn;
     }
@@ -129,13 +132,13 @@ class Injector {
 
     protected function initMethod(array $objInfo) {
         if (count($objInfo) !== 2) {
-            throw new \Exception('Object or method not found.');
+            throw new InvalidArgumentException('Object or method not found.');
         }
         if (!is_object($objInfo[0])) {
-            throw new \Exception('No object given.');
+            throw new InvalidArgumentException('No object given.');
         }
         if (!method_exists($objInfo[0], $objInfo[1])) {
-            throw new \Exception('Method does not exist in object.');
+            throw new InvalidArgumentException('Method does not exist in object.');
         }
         $this->object = $objInfo[0];
         $this->fn = $objInfo[1];
@@ -143,9 +146,7 @@ class Injector {
     }
 
     protected function buildMethodReflector($object, $function): ReflectionMethod {
-        $m = new ReflectionMethod($object, $function);
-        $m->setAccessible(true);
-        return $m;
+        return new ReflectionMethod($object, $function);
     }
 
     protected function buildFunctionReflector($function): ReflectionFunction {
@@ -247,17 +248,16 @@ class Injector {
         foreach ($this->parameters as $expectedParam) {
             $this->assignCallParam($expectedParam, $args, $callParams);
         }
-        if (!$this->allowUnknownParams && count($args) > 0) {
-            throw new \Exception('Unknown Parameters found: ' . join(', ', array_keys($args)));
+        if (!$this->allowUnknownParams && !empty($args)) {
+            throw new \InvalidArgumentException('Unknown Parameters found: ' . join(', ', array_keys($args)));
         }
 
         if ($this->reflectionFn instanceof \ReflectionFunction) {
-            $ret = $this->reflectionFn->invokeArgs($callParams);
             return $this->reflectionFn->invokeArgs($callParams);
         } elseif ($this->reflectionFn instanceof \ReflectionMethod) {
             return $this->reflectionFn->invokeArgs($this->object, $callParams);
         } else {
-            throw new \Exception('Oops: Fatal: the callee you delivered seems not to be a function or method.');
+            throw new InvalidArgumentException('Oops: Fatal: the callee you delivered seems not to be a function or method.');
         }
     }
 
@@ -271,7 +271,7 @@ class Injector {
             unset($params[$name]);
         } elseif ($type instanceof \ReflectionType) {
             // only non-builtin types can be injected by class:
-            if ($type->isBuiltin() !== true) {
+            if (!($type instanceof \ReflectionNamedType) || $type->isBuiltin() !== true) {
                 $value = $this->findParamValueWithType($params, $type);
                 unset($params[$name]);
             }
@@ -279,7 +279,7 @@ class Injector {
             if ($expectedParam['optional']) {
                 $value = $expectedParam['default_value'];
             } else {
-                throw new \Exception("parameter '{$name}' is not optional.");
+                throw new InvalidArgumentException("parameter '{$name}' is not optional.");
             }
         }
 
@@ -326,9 +326,8 @@ class Injector {
             if ($expectedParam['optional'] && $value == null) {
                 return true;
             }
-            throw new \Exception("Parameter '{$expectedParam['name']}' of type '{$expectedParam['type']}' with value '{$value}' invalid for condition '{$cond->getConditionString()}'");
+            throw new InvalidArgumentException("Parameter '{$expectedParam['name']}' of type '{$expectedParam['type']}' with value '{$value}' invalid for condition '{$cond->getConditionString()}'");
         }
-
         return true;
     }
 }
