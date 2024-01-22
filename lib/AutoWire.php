@@ -169,8 +169,13 @@ class AutoWire {
         if (!$type) {
             return null;
         }
-        return $this->container->get((string)$type);
+        if ($this->container->has((string)$type)) {
+            return $this->container->get((string)$type);
+        } else {
+            return null;
+        }
     }
+
     protected function findMatchingValueForType(?ReflectionType $type, array $values) {
         foreach ($values as $value) {
             if ($value instanceof ((string)$type)) {
