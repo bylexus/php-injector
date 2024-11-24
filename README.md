@@ -33,6 +33,7 @@
 - [Developing](#developing)
   - [setup dev env](#setup-dev-env)
   - [run unit tests](#run-unit-tests)
+  - [create and deploy a new version](#create-and-deploy-a-new-version)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
   - [V4.0.0](#v400)
@@ -638,6 +639,14 @@ or manually, using PHPUnit:
 ```shell
 $ php vendor/bin/phpunit ./tests
 ```
+
+### create and deploy a new version
+
+1. Update the Changelog (README.md)
+2. Bump the version in composer.json
+3. Merge the branches to the master branch
+4. Tag the version with a git tag
+5. push the tag to github
 
 ## Compatibility
 
