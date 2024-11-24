@@ -101,10 +101,10 @@ class AutoWire {
     /**
      * @template T
      * @param class-string<T> $className
-     * @param null|ContainerInterface $container
+     * @param null|array<mixed> $params
      * @return T
      */
-    public function createInstance(string $className, array $params = null) {
+    public function createInstance(string $className, array|null $params = null) {
         $refClass = $this->getReflectionClass($className);
         $wantedConstructorParams = $this->getConstructorParams($className);
         $callingParams = [];

@@ -1,4 +1,6 @@
 <?php
+
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class StringConditionTest extends TestCase {
@@ -26,17 +28,13 @@ class StringConditionTest extends TestCase {
         );
     }
 
-    /**
-     * @dataProvider constructDataProvider
-     */
+    #[DataProvider('constructDataProvider')]
     public function test_Construct($condition) {
         $i = new \PhpInjector\StringCondition($condition);
         $this->assertInstanceOf(\PhpInjector\StringCondition::class, $i);
     }
 
-    /**
-     * @dataProvider constructFailDataProvider
-     */
+    #[DataProvider('constructFailDataProvider')]
     public function test_ConstuctWithError($condition) {
         $this->expectException(\Exception::class);
         new \PhpInjector\StringCondition($condition);

@@ -6,6 +6,7 @@ class OctUnitTestClass {
 }
 
 class ObjectTypeCasterTest extends TestCase {
+    public $obj;
     public function setUp(): void {
         $this->obj = new stdClass();
     }

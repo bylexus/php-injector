@@ -10,7 +10,7 @@
 # NOTES:
 # * PWD is set to /src, so all commands you execute with docker exec are started in /src
 #
-FROM php:8.0-cli
+FROM php:8.1-cli
 LABEL maintainer="Alexander Schenkel <aschenkel@kadenpartner.ch>"
 
 RUN apt-get update && apt-get install -y \

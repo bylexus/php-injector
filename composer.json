@@ -2,7 +2,7 @@
     "name": "bylexus/php-injector",
     "description": "A Function / Method parameter injection helper. Makes your Dependency Injection work.",
     "homepage": "https://github.com/bylexus/php-injector",
-    "version": "3.0.1",
+    "version": "4.0.0",
     "authors": [
         {
             "name": "Alexander Schenkel",
@@ -13,7 +13,7 @@
     ],
 
     "require": {
-        "php" : ">= 8.0",
+        "php" : ">= 8.1",
         "ext-mbstring" : "*",
         "psr/container": "^2.0"
     },
@@ -24,10 +24,11 @@
     },
 
     "scripts": {
-        "test": "vendor/bin/phpunit tests"
+        "test": "phpunit --stderr  --display-warnings --display-deprecations --display-phpunit-deprecations --display-errors tests/"
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3.8",
-        "phpunit/phpunit": "^9.6"
+        "squizlabs/php_codesniffer": "^3.11",
+        "phpunit/phpunit": "^10.5",
+        "vimeo/psalm": "^0.3.14"
     }
 }

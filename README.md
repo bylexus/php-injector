@@ -33,8 +33,10 @@
 - [Developing](#developing)
   - [setup dev env](#setup-dev-env)
   - [run unit tests](#run-unit-tests)
+  - [create and deploy a new version](#create-and-deploy-a-new-version)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
+  - [V4.0.0](#v400)
   - [V3.0.0](#v300)
 - [License](#license)
 
@@ -638,14 +640,27 @@ or manually, using PHPUnit:
 $ php vendor/bin/phpunit ./tests
 ```
 
+### create and deploy a new version
+
+1. Update the Changelog (README.md)
+2. Bump the version in composer.json
+3. Merge the branches to the master branch
+4. Tag the version with a git tag
+5. push the tag to github
+
 ## Compatibility
 
 * V1.0.0: PHP >= 7.0 is needed
 * V1.2.0: PHP >= 7.2 is needed
 * V2.0.0: PHP >= 7.4 is needed
 * V3.0.0: PHP >= 8.0 is needed
+* V4.0.0: PHP >= 8.1 is needed
 
 ## Changelog
+
+### V4.0.0
+
+- [breaking] PHP >= 8.1 is now required
 
 ### V3.0.0
 
@@ -654,4 +669,4 @@ $ php vendor/bin/phpunit ./tests
 
 ## License
 
-Licensed under the MIT license, copyright 2015-2021 Alexander Schenkel
+Licensed under the MIT license, copyright 2015-2024 Alexander Schenkel
