@@ -41,11 +41,11 @@ class Injector {
      * @param string|array $functionOrMethod A name of a function (string, e.g 'myFunc') or an
      *           array with an object / method (e.g array($myObj, 'myMethod'))
      *           to create the injector from
-     * @param array $options An array of options. Known options are:
+     * @param array|null $options An array of options. Known options are:
      *   - allow_unknown_params: boolean: True to allow parameters not required in the method's signature
      *   - service_container: Psr\Container\ContainerInterface A service container to resolve params / Services
      */
-    public function __construct($functionOrMethod, array $options = null) {
+    public function __construct($functionOrMethod, array|null $options = null) {
         $this->initOptions($options);
         if (is_string($functionOrMethod)) {
             $this->initFunction($functionOrMethod);
@@ -96,7 +96,7 @@ class Injector {
      * - allow_unknown_params: boolean: True to allow parameters not required in the method's signature
      * - service_container: Psr\Container\ContainerInterface A service container to resolve params / Services
      */
-    protected function initOptions(array $options = null) {
+    protected function initOptions(array|null $options = null) {
         if (isset($options['allow_unknown_params'])) {
             $this->allowUnknownParams = BooleanTypeCaster::cast($options['allow_unknown_params']);
         }
@@ -239,11 +239,11 @@ class Injector {
      * If a parameter, which is expected to be present is not
      * in the $params array, an exception is thrown.
      *
-     * @param array $args An associative array containing the parameters and values
+     * @param array|null $args An associative array containing the parameters and values
      *     for the function to be called, e.g.: array('a'=>1, 'b'=>'Alex')
      * @return mixed The result of the calling function / method
      */
-    public function invoke(array $args = null) {
+    public function invoke(array|null $args = null) {
         $callParams = array();
         foreach ($this->parameters as $expectedParam) {
             $this->assignCallParam($expectedParam, $args, $callParams);
@@ -288,7 +288,7 @@ class Injector {
             $this->checkParameterValidity($value, $expectedParam, $cond);
         }
 
-        if ($expectedParam['type'] instanceof \ReflectionType && $expectedParam['type']->isBuiltin() !== true) {
+        if ($expectedParam['type'] instanceof \ReflectionNamedType && $expectedParam['type']->isBuiltin() !== true) {
             $callParams[$position] = $value;
         } elseif (!empty($expectedParam['type'])) {
             $callParams[$position] = TypeCaster::cast($value, $expectedParam['type']);
