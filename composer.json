@@ -2,7 +2,7 @@
     "name": "bylexus/php-injector",
     "description": "A Function / Method parameter injection helper. Makes your Dependency Injection work.",
     "homepage": "https://github.com/bylexus/php-injector",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "authors": [
         {
             "name": "Alexander Schenkel",
