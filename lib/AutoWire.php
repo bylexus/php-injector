@@ -54,6 +54,7 @@ namespace PhpInjector;
 
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 
@@ -177,9 +178,11 @@ class AutoWire {
     }
 
     protected function findMatchingValueForType(?ReflectionType $type, array $values) {
-        foreach ($values as $value) {
-            if ($value instanceof ((string)$type)) {
-                return $value;
+        if ($type instanceof ReflectionNamedType) {
+            foreach ($values as $value) {
+                if ($value instanceof ($type->getName())) {
+                    return $value;
+                }
             }
         }
         return null;

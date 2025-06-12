@@ -1,12 +1,14 @@
 <?php
 
 namespace {
+
     use PhpInjector\AutoWire;
     use PHPUnit\Framework\TestCase;
     use Test\Fixture\AutoWire\ComplexConstructor;
     use Test\Fixture\AutoWire\DependsOnExistingClass;
     use Test\Fixture\AutoWire\MixedConstructor;
     use Test\Fixture\AutoWire\NoConstructor;
+    use Test\Fixture\AutoWire\NullableTypeConstructor;
     use Test\Fixture\AutoWire\ServiceA;
     use Test\Fixture\AutoWire\ServiceB;
     use Test\Fixture\AutoWire\ServiceC;
@@ -77,8 +79,8 @@ namespace {
             $aw = new AutoWire();
             $noConstrInst = new NoConstructor();
             $inst = $aw->createInstance(MixedConstructor::class, [
-            'param' => 'test',
-            $noConstrInst,
+                'param' => 'test',
+                $noConstrInst,
             ]);
             $this->assertInstanceOf(MixedConstructor::class, $inst);
             $this->assertSame('test', $inst->param);
@@ -90,8 +92,8 @@ namespace {
             $aw = new AutoWire();
             $noConstrInst = new NoConstructor();
             $inst = $aw->createInstance(ComplexConstructor::class, [
-            'param' => 'test',
-            $noConstrInst,
+                'param' => 'test',
+                $noConstrInst,
             ]);
             $this->assertInstanceOf(ComplexConstructor::class, $inst);
             $this->assertSame('test', $inst->param);
@@ -101,8 +103,32 @@ namespace {
             $this->assertInstanceOf(NoConstructor::class, $inst->dependency2->dependency1);
             $this->assertInstanceOf(NoConstructor::class, $inst->dependency2->dependency2);
         }
-    }
 
+        public function testClassWithNullableType() {
+            $aw = new AutoWire();
+
+            // With service instance on a nullable parameter:
+            $serviceA = new ServiceA();
+            $inst = $aw->createInstance(NullableTypeConstructor::class, [
+                $serviceA, 'b' => 44
+            ]);
+            $this->assertInstanceOf(NullableTypeConstructor::class, $inst);
+            $this->assertSame($serviceA, $inst->a);
+            $this->assertSame(44, $inst->b);
+
+            // With no parameter on a nullable parameter:
+            $inst = $aw->createInstance(NullableTypeConstructor::class, []);
+            $this->assertInstanceOf(NullableTypeConstructor::class, $inst);
+            $this->assertNull($inst->a);
+            $this->assertSame(42, $inst->b);
+
+            // With null parameter on a nullable parameter:
+            $inst = $aw->createInstance(NullableTypeConstructor::class, ['a' => null]);
+            $this->assertInstanceOf(NullableTypeConstructor::class, $inst);
+            $this->assertNull($inst->a);
+            $this->assertSame(42, $inst->b);
+        }
+    }
 }
 
 namespace Test\Fixture\AutoWire {
@@ -150,8 +176,17 @@ namespace Test\Fixture\AutoWire {
         }
     }
 
-    class ServiceA {
+    class NullableTypeConstructor {
+        public ?ServiceA $a = null;
+        public ?int $b = null;
 
+        public function __construct(?ServiceA $a = null, ?int $b = 42) {
+            $this->a = $a;
+            $this->b = $b;
+        }
+    }
+
+    class ServiceA {
     }
     class ServiceB {
         public $a;

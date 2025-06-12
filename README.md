@@ -36,6 +36,7 @@
   - [create and deploy a new version](#create-and-deploy-a-new-version)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
+  - [V4.1.0](#v410)
   - [V4.0.0](#v400)
   - [V3.0.0](#v300)
 - [License](#license)
@@ -657,6 +658,10 @@ $ php vendor/bin/phpunit ./tests
 * V4.0.0: PHP >= 8.1 is needed
 
 ## Changelog
+
+### V4.1.0
+
+- [feature] Support for nullable types added: Parameters in the form `?TypeName $foo = null` are also supported.
 
 ### V4.0.0
 
