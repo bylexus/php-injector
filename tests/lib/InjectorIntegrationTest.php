@@ -1,8 +1,17 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 
 function IntegrationTest_simple_function($a, $b, $c = null, $d = 'hello') {
     return array($a, $b, $c, $d);
+}
+
+function IntegrationTest_simple_function_with_types(int $a, int $b = 42, ?int $c = 43) {
+    return array($a, $b, $c);
+}
+
+function IntegrationTest_simple_function_with_bool_types(bool $a, bool $b = true, ?bool $c = false) {
+    return array($a, $b, $c);
 }
 
 /**
@@ -215,5 +224,68 @@ class InjectorIntegrationTest extends TestCase {
         $inj = new \PhpInjector\Injector(array($obj, 'IntegrationTest_typecasting_function_with_conditions'));
         $ret = $inj->invoke(array('b' => '12345', 'a' => null, 'd' => null, 'c' => null));
         $this->assertSame(array(1, '12345', null, null), $ret);
+    }
+
+
+    public function test_simpleFunctionWithTypeCasting() {
+        $values = ['a' => '10'];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(10, 42, 43), $ret);
+
+        $values = ['a' => '10', 'b' => 20, 'c' => null];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(10, 20, null), $ret);
+
+        $values = ['a' => '10', 'b' => '', 'c' => 3.5];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(10, 0, 3), $ret);
+
+        $values = ['a' => true, 'b' => 3.5, 'c' => ''];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(1, 3, 0), $ret);
+    }
+
+    public function test_simpleFunctionWithNonNullableTypeException() {
+        $this->expectException(\TypeError::class);
+        // $b is not nullable, but we pass null. This must result in a type error, because the null value is
+        // not acceptable for the type int $b = 42:
+        $values = ['a' => '10', 'b' => null];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_types');
+        $inj->invoke($values);
+    }
+
+    public function test_simpleFunctionWithBoolTypeCasting() {
+        $values = ['a' => 'true'];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_bool_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(true, true, false), $ret);
+
+        $values = ['a' => 'true', 'b' => false, 'c' => null];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_bool_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(true, false, null), $ret);
+
+        $values = ['a' => 'true', 'b' => '', 'c' => 3.5];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_bool_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(true, false, false), $ret);
+
+        $values = ['a' => true, 'b' => 3.5, 'c' => ''];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_bool_types');
+        $ret = $inj->invoke($values);
+        $this->assertSame(array(true, false, false), $ret);
+    }
+
+    public function test_simpleFunctionWithNonNullableBoolTypeException() {
+        $this->expectException(\TypeError::class);
+        // $b is not nullable, but we pass null. This must result in a type error, because the null value is
+        // not acceptable for the type int $b = 42:
+        $values = ['a' => '10', 'b' => null];
+        $inj = new \PhpInjector\Injector('IntegrationTest_simple_function_with_bool_types');
+        $inj->invoke($values);
     }
 }

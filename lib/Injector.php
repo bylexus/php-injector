@@ -266,16 +266,20 @@ class Injector {
         $position = $expectedParam['position'];
         $type = $expectedParam['type'];
         $value = null;
+        $valueSet = false;
         if (array_key_exists($name, $params)) {
             $value = $params[$name];
+            $valueSet = true;
             unset($params[$name]);
         } elseif ($type instanceof \ReflectionType) {
             // only non-builtin types can be injected by class:
             if (!($type instanceof \ReflectionNamedType) || $type->isBuiltin() !== true) {
                 $value = $this->findParamValueWithType($params, $type);
+                $valueSet = true;
                 unset($params[$name]);
             }
-        } else {
+        }
+        if (!$valueSet) {
             if ($expectedParam['optional']) {
                 $value = $expectedParam['default_value'];
             } else {

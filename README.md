@@ -36,6 +36,7 @@
   - [create and deploy a new version](#create-and-deploy-a-new-version)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
+  - [V4.1.1](#v411)
   - [V4.1.0](#v410)
   - [V4.0.0](#v400)
   - [V3.0.0](#v300)
@@ -658,6 +659,10 @@ $ php vendor/bin/phpunit ./tests
 * V4.0.0: PHP >= 8.1 is needed
 
 ## Changelog
+
+### V4.1.1
+
+- [fix] Optional internal (simple) types with default values are now supported: The default value is used when the optional value is not set (e.g. `?string $foo = 'bar'`)
 
 ### V4.1.0
 
